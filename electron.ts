@@ -4,6 +4,7 @@ import isDev from "electron-is-dev";
 import installExtension, { REDUX_DEVTOOLS } from "electron-devtools-installer";
 // import setupDB from "./electron/db";
 import { Database } from "sqlite3";
+import { sequelize } from "./electron/db";
 
 
 let mainWindow: BrowserWindow | null;
@@ -30,8 +31,8 @@ function createWindow() {
 let db: Database | null = null; 
 
 app.on("ready", () => {
+	sequelize.sync();
     createWindow()
-    // db = setupDB(app);
     if(isDev) installExtension(REDUX_DEVTOOLS).then((name) => console.log(`Added Extension: ${name}`)).catch((err) => console.log("An error occurred: ", err));
 });
 

@@ -5,16 +5,20 @@ interface Product {
 	name: string;
 	description: string;
 	itemProperties: {
-		[propertyId: string]: {
-			id: string;
-			defaultValue?: string;
-			options?: string[];
-			required?: boolean;
-			unique?: boolean;
-			type: "string" | "number" | "boolean" | "date";
-		};
-	};
+		id: string;
+		regex?: string;
+		defaultValue?: string;
+		options?: string[];
+		required?: boolean;
+		unique?: boolean;
+		type: "string" | "number" | "boolean" | "date";
+	}[];
+	standardBinSize?: number;
+	onBinLabel?: string; 
 	customerName: string | null;
+	createdDate: string;
+	updatedDate: string;
+
 }
 
 export interface ProductsState {
@@ -43,4 +47,5 @@ const slice = createSlice({
 export const { upsertProducts, deleteProducts, resetProducts } = slice.actions;
 export const productsReducer = slice.reducer;
 
-export const getProductById = (productId: string) => (state: ProductsState) => state[productId];
+export const getProductById = (productId?: string) => (state: ProductsState) =>
+	productId ? state[productId] : undefined;

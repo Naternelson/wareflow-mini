@@ -1,0 +1,51 @@
+import { Box, Tooltip, TooltipProps, Typography, styled } from "@mui/material";
+import pluralize from 'pluralize';
+export interface ProgressBarProps {
+	total: number;
+	current: number;
+	label?: boolean;
+    /** The singular name of the unit (ie device, case, etc) */
+	unitAlias?: string;
+    placement?: TooltipProps["placement"];
+}
+export const ProgressBar = ({ total, current, label, unitAlias, placement }: ProgressBarProps) => {
+	const percent = (current / total) * 100;
+    const unit = pluralize(unitAlias || "unit", current).toLowerCase();
+    const titleCase = unit.charAt(0).toUpperCase() + unit.slice(1);
+	return (
+		<ProgressBarContainer>
+			{label && (
+				<Tooltip title={`${current} ${titleCase}`} placement={placement} arrow>
+					<span>{`${current} / ${total}`}</span>
+				</Tooltip>
+			)}
+			<StyledProgressBar data-progress={percent} />
+		</ProgressBarContainer>
+	);
+};
+
+
+const StyledProgressBar = styled(Box)<{"data-progress": number}>(({ theme, "data-progress": dataProgress }) => ({
+    position: "relative",
+    height: theme.spacing(1),
+    width: "100%",
+    borderRadius: theme.spacing(1),
+    backgroundColor: theme.palette.grey[300],
+    "&::after": {
+        content: "''",
+        position: "absolute",
+        top: 0,
+        left: 0,
+        height: "100%",
+        borderRadius: theme.spacing(1),
+        width: dataProgress + "%",
+        backgroundColor: theme.palette.primary.main,
+    },
+}));
+
+const ProgressBarContainer = styled(Box)(({ theme }) => ({
+    display: "flex",
+    width: "100%",
+    flexDirection: "column",
+    textAlign: "right",
+}));

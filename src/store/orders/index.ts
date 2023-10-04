@@ -1,12 +1,14 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-interface Order {
+export interface Order {
 	orderId: string;
 	orderDate: string;
 	orderTotal: number;
 	orderStatus: "queued" | "in-progress" | "paused" | "completed" | "canceled";
 	productId: string;
 	orderCount: number;
+	createdDate: string, 
+	updatedDate: string 
 }
 
 export interface OrdersState {
@@ -23,6 +25,7 @@ const slice = createSlice({
 			const order = state[action.payload.orderId];
 			if (order) {
 				order.orderCount -= action.payload.decrementBy || 1;
+				order.updatedDate = new Date().toISOString();
 			}
 		},
 		deleteOrders: (state, action: PayloadAction<string[]>) => {
@@ -34,6 +37,7 @@ const slice = createSlice({
 			const order = state[action.payload.orderId];
 			if (order) {
 				order.orderCount += action.payload.incrementBy || 1;
+				order.updatedDate = new Date().toISOString();
 			}
 		},
 		resetOrders: () => initialState,
@@ -54,4 +58,4 @@ export const { decrementOrderCount, deleteOrders, incrementOrderCount, resetOrde
 
 export const ordersReducer = slice.reducer;
 
-export const getOrderById = (orderId: string) => (state: OrdersState) => state[orderId];
+export const getOrderById = (orderId?: string) => (state: OrdersState) => orderId ? state[orderId] : undefined;

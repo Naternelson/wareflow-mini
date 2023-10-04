@@ -1,6 +1,6 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 
-interface ProductItem {
+export interface ProductItem {
 	productId: string;
 	properties: {
 		[propertyId: string]: string; // Lookup product item properties
@@ -8,6 +8,8 @@ interface ProductItem {
 	binId: string | null;
 	quantity: number; // May be grouped by product item properties, default is one
 	printed?: boolean;
+	createdDate: string;
+	updatedDate: string;
 }
 
 export interface ProductItemsState {
@@ -35,18 +37,21 @@ const slice = createSlice({
 			const productItem = state[action.payload.productItemId];
 			if (productItem) {
 				productItem.properties[action.payload.propertyId] = action.payload.value;
+				productItem.updatedDate = new Date().toISOString();
 			}
 		},
 		deleteProductItemProperty: (state, action: PayloadAction<{ productItemId: string; propertyId: string }>) => {
 			const productItem = state[action.payload.productItemId];
 			if (productItem) {
 				delete productItem.properties[action.payload.propertyId];
+				productItem.updatedDate = new Date().toISOString();
 			}
 		},
 		updateItemPrinted: (state, action: PayloadAction<{ productItemId: string; printed: boolean }>) => {
 			const productItem = state[action.payload.productItemId];
 			if (productItem) {
 				productItem.printed = action.payload.printed;
+				productItem.updatedDate = new Date().toISOString();
 			}
 		},
 	},

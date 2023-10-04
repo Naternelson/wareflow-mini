@@ -2,15 +2,18 @@ import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 
 interface Bin {
 	id: string;
+	orderId: string;
 	productId: string[];
 	quantityByProduct: {
 		[productId: string]: number;
 	};
 	total: number;
 	devices: string[]; // Unique device ids;
-    maxQuantity?: number;
-    printTo?: string;
-    autoPrint?: boolean
+	maxQuantity?: number;
+	printTo?: string;
+	autoPrint?: boolean;
+	createdDate: string;
+	updatedDate: string;
 }
 
 export interface BinsState {
@@ -54,6 +57,7 @@ const slice = createSlice({
 
 			// Increase the total count
 			bin.total++;
+			bin.updatedDate = new Date().toISOString();
 		},
 		deleteDevice: (state, action: PayloadAction<{ binId: string; deviceId: string; productId: string }>) => {
 			const bin = state[action.payload.binId];
@@ -78,6 +82,7 @@ const slice = createSlice({
 
 			// Decrease the total count
 			bin.total--;
+			bin.updatedDate = new Date().toISOString();
 		},
 	},
 });
@@ -85,4 +90,4 @@ const slice = createSlice({
 export const { upsertBins, deleteBins, resetBins, insertDevice, deleteDevice } = slice.actions;
 export const binsReducer = slice.reducer;
 
-export const getBinById = (binId: string) => (state: BinsState) => state[binId];
+export const getBinById = (binId?: string) => (state: BinsState) => state[binId || ""];
