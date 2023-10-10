@@ -7,6 +7,8 @@ export class Department extends Model {
     public name!: string;
     public organizationId!: number;
     public description?: string;
+    public readonly createdAt!: Date;
+    public readonly updatedAt!: Date;
 
 }
 

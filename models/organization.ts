@@ -1,12 +1,35 @@
 import { DataTypes, INTEGER, STRING } from "sequelize";
 import { Model } from "sequelize";
 import { sequelize } from "../electron/db";
-export class Organization extends Model {
+import { Address } from "./address";
+import { OrganizationRole } from "./organization_role";
+
+export type OrganizationAttributes = {
+	organizationId?: number;
+	name: string;
+	phone?: string;
+	address?: number;
+	createdAt?: Date;
+	updatedAt?: Date;
+};
+
+export class Organization extends Model<OrganizationAttributes> implements OrganizationAttributes {
 	public organizationId!: number;
 	public name!: string;
 	public phone?: string;
 	public address?: number;
+	public readonly createdAt!: Date;
+	public readonly updatedAt!: Date;
 }
+
+// export class Organization extends Model {
+// 	public organizationId!: number;
+// 	public name!: string;
+// 	public phone?: string;
+// 	public address?: number;
+//     public readonly createdAt!: Date;
+//     public readonly updatedAt!: Date;
+// }
 
 Organization.init(
 	{
@@ -40,7 +63,12 @@ Organization.init(
 	}
 );
 
-// Organization.belongsTo(Address, {
-//     foreignKey: "addressId",
-//     as: "address",
-//});
+Organization.belongsTo(Address, {
+    foreignKey: "addressId",
+    as: "address",
+});
+
+Organization.hasMany(OrganizationRole, {
+    foreignKey: "organizationId",
+    as: "roles",
+});

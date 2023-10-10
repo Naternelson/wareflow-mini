@@ -1,11 +1,28 @@
+// /models/organization_role.ts
+
 import { sequelize } from "../electron/db";
 import { Model, DataTypes } from "sequelize";
 import { Organization } from "./organization";
+import { User } from "./user";
 
-export class OrganizationRole extends Model {
+export type OrganizationRoleAttributes = {
+	organizationUserId?: number;
+	organizationId: number;
+	role: string;
+	createdAt?: Date;
+	updatedAt?: Date;
+};
+
+
+export class OrganizationRole extends Model<OrganizationRoleAttributes> implements OrganizationRoleAttributes {
 	public organizationUserId!: number;
 	public organizationId!: number;
 	public role!: string;
+    public readonly createdAt!: Date;
+    public readonly updatedAt!: Date;
+
+    organization?: Organization;
+    user?: User;
 }
 
 OrganizationRole.init(
@@ -39,4 +56,9 @@ OrganizationRole.belongsTo(Organization, {
 	foreignKey: "organizationId",
 	as: "organization",
 	onDelete: "CASCADE",
+});
+
+OrganizationRole.hasOne(User, {
+	foreignKey: "organizationRoleId",
+	as: "user",
 });

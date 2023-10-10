@@ -1,4 +1,4 @@
-// database.ts
+// /electron/db.ts
 
 import { Sequelize } from "sequelize";
 import {app} from "electron";

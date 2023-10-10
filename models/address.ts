@@ -1,7 +1,20 @@
 import { DataTypes, Model } from "sequelize";
 import { sequelize } from "../electron/db";
+import { Organization } from "./organization";
 
-export class Address extends Model {
+export type AddressAttributes = {
+    addressId?: number;
+    street?: string;
+    secondary?: string;
+    city?: string;
+    state?: string;
+    zip?: string;
+    country?: string;
+    latitude?: number;
+    longitude?: number;
+};
+
+export class Address extends Model<AddressAttributes> implements AddressAttributes {
     public addressId!: number;
     public street?: string;
     public secondary?: string;
@@ -57,3 +70,9 @@ Address.init({
     tableName: "addresses",
     sequelize,
 })
+
+
+Address.hasMany(Organization, {
+    foreignKey: "addressId",
+    as: "organization",
+});
