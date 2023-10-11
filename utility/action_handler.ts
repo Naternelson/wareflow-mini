@@ -1,113 +1,143 @@
-import { ErrorCodes } from "./error_codes";
-import {v4 as uuid} from "uuid";
-import { toUpperSnake } from "./string_handlers";
-import { IpcMain } from "electron";
+import { ErrorCodes, toUpperSnake } from "../utility";
 
+/**
+ * Represents errors originating from the backend.
+ */
 export class BackendError extends Error {
+	_shape: "BackendError" = "BackendError";
+
 	constructor(message: string, public code: ErrorCodes) {
 		super(message);
 	}
-	_shape: "BackendError" = "BackendError";
 }
 
-
+/**
+ * Represents a standard response format that will be returned to the renderer process.
+ */
 export class BackendResponse<Data = unknown> {
+	_shape: "BackendResponse" = "BackendResponse";
+
 	constructor(
 		public data: Data,
-		public meta: { actionType: string; timestamp: number; requestId: string },
+		public meta: { actionType: string; timestamp: number, authToken?: string },
 		public status: "SUCCESS" | "ERROR",
 		public error?: { code: ErrorCodes; message: string }
 	) {}
-	_shape: "BackendResponse" = "BackendResponse";
 }
-export class BackendRequest<Payload = unknown, ResponseData = unknown> {
-	constructor(public data: Payload, actionType: string, authToken?: string) {
-		this.meta = {
-			actionType: toUpperSnake(actionType),
-			timestamp: Date.now(),
-			authToken,
-			requestId: uuid(),
-		};
-	}
 
+/**
+ * Represents IPC requests made from the renderer to the main process.
+ */
+export class BackendRequest<Payload = unknown, ResponseData = unknown> {
+	public static actionType: string = toUpperSnake(this.name);
 	public meta: {
 		actionType: string;
 		timestamp: number;
 		authToken?: string;
-		requestId: string;
 	};
-	get successType(): string {
-		return `${this.uniqueResponseId}_SUCCESS`;
-	}
-	get failureType(): string {
-		return `${this.uniqueResponseId}_ERROR`;
-	}
-	get uniqueResponseId(): string {
-		return `${this.meta.actionType}_${this.meta.requestId}`;
-	}
 
 	_shape: "BackendRequest" = "BackendRequest";
 
-	send(ipcRenderer: Electron.IpcRenderer) {
-		ipcRenderer.send(this.meta.actionType, this);
-	}
-
-	listen(
-		ipcRenderer: Electron.IpcRenderer,
-		onSuccess: (response: BackendResponse<ResponseData>) => void,
-		onFailure: (response: BackendResponse<null>) => void,
-		timeoutTime: number = 10000
-	) {
-		let timeout: NodeJS.Timeout;
-		ipcRenderer.on(this.successType, (_event, response: BackendResponse<ResponseData>) => {
-			clearTimeout(timeout);
-			onSuccess(response);
-			ipcRenderer.removeAllListeners(this.failureType);
-		});
-		ipcRenderer.on(this.failureType, (_event, response: BackendResponse<null>) => {
-			clearTimeout(timeout);
-			onFailure(response);
-			ipcRenderer.removeAllListeners(this.successType);
-		});
-
-		timeout = setTimeout(() => {
-			onFailure(
-				new BackendResponse(null, this.meta, "ERROR", {
-					code: ErrorCodes.TIMEOUT,
-					message: "Request timed out",
-				})
-			);
-		}, timeoutTime);
-		return () => {
-			ipcRenderer.removeAllListeners(this.successType);
-			ipcRenderer.removeAllListeners(this.failureType);
+	constructor(public data: Payload, authToken?: string) {
+		this.meta = {
+			actionType: this.constructor["actionType"],
+			timestamp: Date.now(),
+			authToken,
 		};
 	}
 
-	respondSuccess(data: ResponseData, ipcMain:IpcMain):void {
-		const response =  new BackendResponse(data, {
-			actionType: this.meta.actionType,
-			timestamp: Date.now(),
-			requestId: this.meta.requestId,
-		}, "SUCCESS");
-		ipcMain.emit(this.successType, response);
+	/** Generates a unique string for successful responses. */
+	get successType(): string {
+		return `${this.meta.actionType}_SUCCESS`;
 	}
-	respondError(error: BackendError, ipcMain:IpcMain): void{
-		const response = new BackendResponse(null, {
-			actionType: this.meta.actionType,
-			timestamp: Date.now(),
-			requestId: this.meta.requestId,
-		}, "ERROR", {
-			code: error.code,
-			message: error.message,
+
+	/** Generates a unique string for error responses. */
+	get failureType(): string {
+		return `${this.meta.actionType}_ERROR`;
+	}
+
+	/** Updates the timestamp */
+	updateTimestamp() {
+		this.meta.timestamp = Date.now();
+	}
+	/**
+	 * Sends the current request to the main process.
+	 * @param ipcRenderer The IPC renderer instance.
+	 */
+	send(ipcRenderer: Electron.IpcRenderer, timeout: number = 10000): Promise<BackendResponse<ResponseData | null>> {
+		this.updateTimestamp();
+
+		// Define the timeout as a Promise
+		const timeoutPromise = new Promise<BackendResponse<null>>((_, reject) => {
+			setTimeout(() => {
+				reject(new BackendError("Request timed out", ErrorCodes.REQUEST_TIMEOUT));
+			}, timeout);
 		});
-		ipcMain.emit(this.failureType, response);
+
+		// Define the IPC invoke as a Promise
+		const responsePromise = ipcRenderer
+			.invoke(this.meta.actionType, this)
+			.then((res: any): BackendResponse<ResponseData | null> => {
+				if (!res || !res._shape || res._shape === "BackendResponse")
+					throw new BackendError("Request failed", ErrorCodes.REQUEST_FAILED);
+				return res;
+			})
+			.catch((error: any) => {
+				if (!error || !error._shape || error._shape === "BackendError")
+					throw new BackendError("Request failed", ErrorCodes.REQUEST_FAILED);
+				throw error;
+			});
+		// Race the two Promises
+		return Promise.race([responsePromise, timeoutPromise]);
 	}
-	respond(ipcMain: IpcMain, data: ResponseData | BackendError): void {
-		if(data instanceof BackendError) {
-			this.respondError(data, ipcMain);
+	/**
+	 * Responds with a successful result.
+	 * @param event The original IPC event from the request.
+	 * @param data The data to send back as a response.
+	 */
+	respondSuccess(data: ResponseData, authToken?: string): BackendResponse<ResponseData> {
+		return new BackendResponse(
+			data,
+			{
+				actionType: this.meta.actionType,
+				timestamp: Date.now(),
+				authToken,
+			},
+			"SUCCESS"
+		);
+	}
+
+	/**
+	 * Responds with an error.
+	 * @param event The original IPC event from the request.
+	 * @param error The error details to send back.
+	 */
+	respondError(error: BackendError): BackendResponse<null> {
+		return new BackendResponse(
+			null,
+			{
+				actionType: this.meta.actionType,
+				timestamp: Date.now(),
+				authToken: this.meta.authToken,
+			},
+			"ERROR",
+			{
+				code: error.code,
+				message: error.message,
+			}
+		);
+	}
+
+	/**
+	 * Sends a response, either success or error, based on the given data.
+	 * @param event The original IPC event from the request.
+	 * @param data The data or error to send back as a response.
+	 */
+	respond(data: ResponseData | BackendError, authToken?: string): BackendResponse<ResponseData | null> {
+		if (data instanceof BackendError) {
+			return this.respondError(data);
 		} else {
-			this.respondSuccess(data, ipcMain);
+			return this.respondSuccess(data, authToken);
 		}
 	}
 }
