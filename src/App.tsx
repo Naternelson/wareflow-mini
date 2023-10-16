@@ -1,11 +1,10 @@
 import React from "react";
-import logo from "./logo.svg";
-import { Provider } from "react-redux";
-import store from "./store";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { RouterProvider } from "react-router-dom";
-import router from "./routing";
+import {router} from "./routing";
 import theme from "./theme";
+import { Provider } from "react-redux";
+import {store} from "./store";
 function App() {
 	return (
 		<Provider store={store}>

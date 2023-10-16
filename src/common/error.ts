@@ -1,0 +1,17 @@
+export enum ErrorCodes {
+	REQUEST_NOT_FOUND = "request/not-found",
+	MISSING_REQUEST_DATA = "request/missing-data",
+	REQUEST_INVALID = "request/invalid",
+	REQUEST_TIMEOUT = "request/timeout",
+	REQUEST_FAILED = "request/failed",
+	INTERNAL_SERVER_ERROR = "server/internal-error",
+	DATABASE_ERROR = "server/database-error",
+	USER_NOT_FOUND = "user/not-found",
+	USER_ALREADY_EXISTS = "user/already-exists",
+	USER_INVALID_PASSWORD = "user/invalid-password",
+	USER_INVALID_EMAIL = "user/invalid-email",
+	UNAUTHORIZED = "auth/unauthorized",
+	INVALID_TOKEN = "auth/invalid-token",
+	DATA_NOT_FOUND = "data/not-found",
+	UNKNOWN_ERROR = "unknown/error",
+}

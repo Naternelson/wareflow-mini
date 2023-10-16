@@ -1,13 +1,19 @@
-import React from "react";
 import { createBrowserRouter } from "react-router-dom";
-import { HomeView } from "../views";
+import { Dashboard, Landing, ProtectedLayout } from "../views";
 
-const router = createBrowserRouter([
+export const router = createBrowserRouter([
 	{
 		path: "/",
-		element: <HomeView/>
-    }
-	// Add other routes as necessary, such as '/login'.
+		element: <ProtectedLayout />,
+		children: [
+			{
+				index: true,
+				element: <Dashboard />,
+			},
+		],
+	},
+	{
+		path: "/landing",
+		element: <Landing />,
+	},
 ]);
-
-export default router;

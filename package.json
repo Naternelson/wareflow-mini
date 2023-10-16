@@ -78,6 +78,9 @@
 	},
 	"devDependencies": {
 		"@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+		"@babel/plugin-transform-class-properties": "^7.22.5",
+		"@babel/plugin-transform-private-methods": "^7.22.5",
+		"@babel/preset-typescript": "^7.23.2",
 		"@types/bcrypt": "^5.0.0",
 		"@types/electron": "^1.6.10",
 		"@types/jsonwebtoken": "^9.0.3",
