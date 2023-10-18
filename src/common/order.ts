@@ -2,7 +2,10 @@ import { SanitizedAddress } from "./helpers"
 
 export enum OrderStatus {
     QUEUED = "QUEUED",
-    IN_PROGRESS = "IN_PROGRESS",
+    PICKING = "PICKING",
+    ASSEMBLY = "ASSEMBLING",
+    PAUSED = "PAUSED",
+    ERROR = "PROBLEM",
     COMPLETED = "COMPLETED",
     CANCELLED = "CANCELLED",
     DELIVERED = "DELIVERED",

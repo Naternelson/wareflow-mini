@@ -4,3 +4,4 @@ export * from "./styled_row";
 export * from "./styled_flex";
 
 export * from "./animations";
+export * from "./status-indicator";
