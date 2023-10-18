@@ -1,0 +1,55 @@
+import { SanitizedAddress } from "./helpers"
+
+export enum OrderStatus {
+    QUEUED = "QUEUED",
+    IN_PROGRESS = "IN_PROGRESS",
+    COMPLETED = "COMPLETED",
+    CANCELLED = "CANCELLED",
+    DELIVERED = "DELIVERED",
+}
+
+export type SanitizedOrder= Partial<{
+    id: number
+    status: OrderStatus
+    organizationId: number
+    customerId: number
+    createdAt: Date
+    updatedAt: Date
+}>
+
+export type SanitizedProduct = Partial<{
+    id: number
+    name: string
+    description: string
+    createdAt: Date
+    updatedAt: Date
+}>
+
+
+export type SanitizedOrderItem = Partial<{
+    id: number
+    orderId: number
+    productId: number
+    quantityOrdered: number
+    quanityAvailable: number
+    dueOn: Date
+    createdAt: Date
+    updatedAt: Date
+}>
+
+export type SanitizedCustomer = Partial<{
+    id: number
+    name: string
+    address: SanitizedAddress
+    createdAt: Date
+    updatedAt: Date
+}>
+
+
+
+export type OrderResponse  = SanitizedOrder & {
+    orderItems: {orderItem: SanitizedOrderItem, product: SanitizedProduct}[]
+    customer: SanitizedCustomer
+}
+
+export type OrdersResponse = OrderResponse[]

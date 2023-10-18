@@ -8,7 +8,7 @@ const theme = createTheme({
 	},
 	palette: {
 		primary: {
-			main: "#2996B8",
+			main: "#3C4355",
 		},
 		secondary: {
 			main: "#3C4355",
@@ -26,6 +26,7 @@ const theme = createTheme({
 			},
 		},
 	},
+
 });
 
 export default theme;

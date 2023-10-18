@@ -10,7 +10,7 @@ export const StyledFlex = styled(Box, { shouldForwardProp: (prop) => !customProp
 }>`
 	display: flex;
 	justify-content: ${({ justifyContent }) => justifyContent || "flex-start"};
-	align-items: ${({ alignItems }) => alignItems || "center"};
+	align-items: ${({ alignItems }) => alignItems || "flex-start"};
 	gap: ${({ gap }) => gap || "0"};
 	flex: ${({ flex }) => flex || "0 1 auto"};
 	flex-direction: ${({ flexDirection }) => flexDirection || "row"};
