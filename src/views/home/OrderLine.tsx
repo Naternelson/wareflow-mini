@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { OrderResponse, SanitizedOrderItem, SanitizedProduct } from "../../common/order";
 import { Box, Button, Collapse, Typography, styled } from "@mui/material";
-import { StyledRow } from "../../components";
 
 const useOrderLineHooks = (order: OrderResponse) => {
 	const [expanded, setExpanded] = useState(false);

@@ -1,7 +1,6 @@
-import { Typography, TypographyProps, List } from "@mui/material";
-import { SearchBar, StatusIndicator, StatusMenu, StyledColumn } from "../../components";
-import { OrderResponse, OrderStatus, OrdersResponse, SanitizedCustomer, SanitizedOrder, SanitizedOrderItem, SanitizedProduct } from "../../common/order";
-import { useState } from "react";
+import { Typography, TypographyProps } from "@mui/material";
+import { SearchBar,  StyledColumn } from "../../components";
+import { OrderStatus, OrdersResponse, SanitizedCustomer, SanitizedOrder, SanitizedOrderItem, SanitizedProduct } from "../../common/order";
 import { OrdersList } from "./OrderList";
 import {faker} from "@faker-js/faker"
 
