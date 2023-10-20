@@ -13,9 +13,11 @@ export enum OrderStatus {
 
 export type SanitizedOrder= Partial<{
     id: number
-    status: OrderStatus
     organizationId: number
     customerId: number
+    dueOn: Date
+    receivedDate: Date
+    deliverToId: number
     createdAt: Date
     updatedAt: Date
 }>
@@ -23,6 +25,7 @@ export type SanitizedOrder= Partial<{
 export type SanitizedProduct = Partial<{
     id: number
     name: string
+    organizationId: number
     description: string
     createdAt: Date
     updatedAt: Date
@@ -35,7 +38,7 @@ export type SanitizedOrderItem = Partial<{
     productId: number
     quantityOrdered: number
     quanityAvailable: number
-    dueOn: Date
+    status: OrderStatus
     createdAt: Date
     updatedAt: Date
 }>
@@ -51,8 +54,9 @@ export type SanitizedCustomer = Partial<{
 
 
 export type OrderResponse  = SanitizedOrder & {
-    orderItems: {orderItem: SanitizedOrderItem, product: SanitizedProduct}[]
+    items: (SanitizedOrderItem & {product: SanitizedProduct})[]
     customer: SanitizedCustomer
 }
 
 export type OrdersResponse = OrderResponse[]
+
