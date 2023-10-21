@@ -1,17 +1,18 @@
-import { Stack } from "@mui/material";
+import { Paper, Stack, StackProps } from "@mui/material";
 import { OrdersResponse } from "../../common/order";
 import { OrderLineItem } from "./OrderLine";
 import { useFocusLock } from "../../utility";
 
 export const OrdersList = (props: { orders: OrdersResponse }) => {
 
-	const ref = useFocusLock({loop: true, avoidSelectors: ["button"], includeLeftRightKeys: true, includeUpDownKeys: true, focusOnMount: 5, preventScollToView:false});
+    // avoid selectros should inlcude buttons and any element that has a aria-hidden attribute
+    const avoidSelectors = ["button", "[aria-hidden='true']"]
+	const ref = useFocusLock({loop: false, includeUpDownKeys:true, avoidSelectors,focusOnMount: true});
 	return (
-		<Stack ref={ref}>
+		<Stack ref={ref} width={"100%"} gap={"2px"}>
 			{props.orders.map((order) => (
 				<OrderLineItem order={order} key={order.id} />
 			))}
 		</Stack>
 	);
 };
-

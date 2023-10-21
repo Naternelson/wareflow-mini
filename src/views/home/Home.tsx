@@ -34,7 +34,7 @@ const createFakeOrders = (count: number): OrdersResponse => {
 	for(let i = 0; i < count; i++) {
 		const customer = createFakeCustomer();
 		const order = createFakeOrder(customer);
-		const products = Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, () => createFakeProduct(order));
+		const products = Array.from({ length: faker.number.int({ min: 1, max: 3 }) }, () => createFakeProduct(order));
 		const items = products.map((product) => ({ ...createFakeOrderItem(order, product), product }));
 		orders.push({
 			...order,
@@ -65,7 +65,7 @@ const createFakeOrder = (customer: SanitizedCustomer): SanitizedOrder => {
 		id: makeId(),
 		organizationId: makeId(),
 		customerId: customer.id,
-		dueOn: faker.date.future(),
+		dueOn: faker.date.anytime(),
 		receivedDate: faker.date.recent(),
 		deliverToId: makeId(),
 		createdAt: faker.date.recent(),
@@ -97,5 +97,32 @@ const createFakeOrderItem = (order: SanitizedOrder, product: SanitizedProduct): 
 		updatedAt: new Date(),
 	}
 }
-const fakeOrders = createFakeOrders(20)
+
+const getPriorityStatus = (status: Array<OrderStatus | undefined>): OrderStatus => {
+	if (status.includes(OrderStatus.ERROR)) return OrderStatus.ERROR;
+	if (status.includes(OrderStatus.PICKING)) return OrderStatus.PICKING;
+	if (status.includes(OrderStatus.ASSEMBLY)) return OrderStatus.ASSEMBLY;
+	if (status.includes(OrderStatus.QUEUED)) return OrderStatus.QUEUED;
+	if (status.includes(OrderStatus.PAUSED)) return OrderStatus.PAUSED;
+	if (status.includes(OrderStatus.COMPLETED)) return OrderStatus.COMPLETED;
+	if (status.includes(OrderStatus.CANCELLED)) return OrderStatus.CANCELLED;
+	if (status.includes(OrderStatus.DELIVERED)) return OrderStatus.DELIVERED;
+	// Default
+	return OrderStatus.QUEUED;
+};
+
+const StandardStatusOrder = [OrderStatus.ASSEMBLY, OrderStatus.PICKING, OrderStatus.ERROR, OrderStatus.PAUSED, OrderStatus.QUEUED, OrderStatus.COMPLETED, OrderStatus.CANCELLED, OrderStatus.DELIVERED]
+
+
+//Sort via the status and then by the due date
+
+const fakeOrders = createFakeOrders(20).sort((a, b) => {
+	const aStatus = getPriorityStatus(a.items.map((item) => item.status));
+	const bStatus = getPriorityStatus(b.items.map((item) => item.status));
+	if (aStatus === bStatus) {
+		return (a.dueOn?.getTime() ?? 0) - (b.dueOn?.getTime() ?? 0);
+	}
+	return StandardStatusOrder.indexOf(aStatus) - StandardStatusOrder.indexOf(bStatus);
+});
+
 

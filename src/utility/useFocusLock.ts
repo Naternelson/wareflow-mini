@@ -21,7 +21,7 @@ const generateQuery = (avoidSelectors: string[], directionChildren:boolean = fal
  */
 const addShakeAnimation = (targetRef: HTMLElement, duration: number) => {
 	targetRef.style.animation = `shake ${duration}ms ease-in-out`;
-	setTimeout(() => (targetRef.style.animation = ""), duration);
+	return setTimeout(() => (targetRef.style.animation = ""), duration);
 };
 
 
@@ -137,13 +137,16 @@ const handleKeyDown = (params: InternalFocusHookParams & { target: HTMLDivElemen
 	const currentIndex = focusableElements.indexOf(document.activeElement as HTMLElement);
 	const [nextIndex, madeChange] = handleNextIndex({ ...params, event: e, currentIndex, focusableElements });
     if (nextIndex === undefined) return;
-    if(madeChange) e.preventDefault()
+    if(!madeChange) return 
+    e.preventDefault()
+    console.log("madeChange", madeChange, "nextIndex", nextIndex, "currentIndex", currentIndex, "loop", loop, "preventScollToView", preventScollToView)
 	const lastIndex = focusableElements.length - 1;
 	const blockedTop = !loop && nextIndex === 0 && currentIndex === 0;
 	const blockedBottom = !loop && nextIndex === lastIndex && currentIndex === lastIndex;
 	const blocked = madeChange && (blockedTop || blockedBottom);
     const nextTarget = focusableElements[nextIndex];
-	if (blocked) addShakeAnimation(nextTarget, 500);
+    let timeout:NodeJS.Timeout | null = null;
+	if (blocked) timeout = addShakeAnimation(nextTarget, 500);
     else if (madeChange) {
 		nextTarget?.focus();
 		if(!preventScollToView) nextTarget?.scrollIntoView({ behavior: "smooth", block: "center", inline: "center"});
@@ -153,6 +156,7 @@ const handleKeyDown = (params: InternalFocusHookParams & { target: HTMLDivElemen
 			console.error(e);
 		}
 	}
+    return () => timeout && clearTimeout(timeout);
 };
 
 const isTabForward = (e: KeyboardEvent) => e.key === "Tab" && !e.shiftKey;

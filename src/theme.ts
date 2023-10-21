@@ -4,7 +4,19 @@ const theme = createTheme({
 	typography: {
 		htmlFontSize: 14,
 		fontSize: 12,
-		fontFamily: "Inter, Roboto, sans-serif",
+		fontFamily: [
+			"Inter",
+			"-apple-system",
+			"BlinkMacSystemFont",
+			'"Segoe UI"',
+			"Roboto",
+			'"Helvetica Neue"',
+			"Arial",
+			"sans-serif",
+			'"Apple Color Emoji"',
+			'"Segoe UI Emoji"',
+			'"Segoe UI Symbol"',
+		].join(","),
 	},
 	palette: {
 		primary: {
@@ -26,7 +38,6 @@ const theme = createTheme({
 			},
 		},
 	},
-
 });
 
 export default theme;
