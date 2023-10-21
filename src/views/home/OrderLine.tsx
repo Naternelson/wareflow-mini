@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { OrderResponse, OrderStatus, SanitizedOrderItem, SanitizedProduct } from "../../common/order";
+import { OrderResponse, OrderStatus } from "../../common/order";
 import { Box, Button, Collapse, Divider, Paper, Stack, Tooltip, Typography, styled } from "@mui/material";
 import { StatusIndicator } from "../../components";
 import { toTitleCase } from "../../utility";

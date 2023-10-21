@@ -1,4 +1,4 @@
-import { Paper, Stack, StackProps } from "@mui/material";
+import { Stack } from "@mui/material";
 import { OrdersResponse } from "../../common/order";
 import { OrderLineItem } from "./OrderLine";
 import { useFocusLock } from "../../utility";

@@ -1,4 +1,4 @@
-import { Box, PaletteColor, Tooltip, TooltipProps, styled } from "@mui/material";
+import { Box, Tooltip, TooltipProps, styled } from "@mui/material";
 import pluralize from 'pluralize';
 
 type AcceptedColors = "primary" | "secondary" | "error" | "warning" | "info" | "success" | "inherit";
