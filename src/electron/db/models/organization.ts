@@ -1,8 +1,6 @@
 import {
-	BelongsToCreateAssociationMixin,
 	CreationOptional,
 	DataTypes,
-	ForeignKey,
 	HasManyCreateAssociationMixin,
 	InferAttributes,
 	InferCreationAttributes,
@@ -10,7 +8,7 @@ import {
 	NonAttribute,
 } from "sequelize";
 import { User } from "./user";
-import { Address } from "./address";
+// import { Address } from "./address";
 import { sequelize } from "../db";
 import { BasicOrganization } from "../../../common/models/organization";
 
@@ -24,7 +22,7 @@ export class Organization extends Model<InferAttributes<Organization>, InferCrea
 	declare users: NonAttribute<User[]>;
 	// declare address: NonAttribute<Address>;
 
-	declare createAddress: BelongsToCreateAssociationMixin<Address>;
+	// declare createAddress: BelongsToCreateAssociationMixin<Address>;
 	declare createUser: HasManyCreateAssociationMixin<User>;
 	findUserByPk = async (id: number) => {
 		return await User.findOne({where: {id, organizationId: this.id}, include: ["organization"]})
