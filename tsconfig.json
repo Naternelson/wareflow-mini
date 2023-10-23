@@ -16,5 +16,5 @@
 		"noEmit": true,
 		"jsx": "react-jsx"
 	},
-	"include": ["src", "src/electron.d.ts"]
+	"include": ["src", "src/electron/electron.d.ts"]
 }

@@ -3,8 +3,9 @@ import path from "path";
 import isDev from "electron-is-dev";
 import installExtension, { REDUX_DEVTOOLS } from "electron-devtools-installer";
 import { Database } from "sqlite3";
-import { sequelize } from "./src/database/db"
+import { sequelize } from "./src/electron/db/db"
 import {config} from "dotenv";
+import "./src/electron/db/main"
 config();
 
 
