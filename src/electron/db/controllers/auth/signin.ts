@@ -1,13 +1,19 @@
-import { findMissingFields } from "../../../../common";
-import { RequestHandler } from "../../../../common/api_controller";
-import { ApiError, BadRequestError, InternalServerError, NotFoundError } from "../../../../common/api_error";
-import { AuthResponse } from "../../../../common/models";
+import {
+	findMissingFields,
+	ApiError,
+	BadRequestError,
+	InternalServerError,
+	NotFoundError,
+	RequestHandler,
+	AuthResponse,
+} from "../../../../common";
+import { ApiRequest } from "../../../../common/api_request";
 import { logger } from "../../../logger";
 import { User } from "../../models/user";
 
 const MissingUserMessage = "No user or organization was found"
 
-export const signinUser: RequestHandler = async (request): Promise<AuthResponse> => {
+export const signinUser: RequestHandler = async (request: ApiRequest<{email: string, password: string, organizationId: number}, AuthResponse>) => {
     const {email, password, organizationId} = request.body || {};
     // Check for required fields
     const missingFields = findMissingFields({email, password, organizationId})
@@ -40,5 +46,4 @@ export const signinUser: RequestHandler = async (request): Promise<AuthResponse>
         if(error instanceof ApiError) throw error;
         throw new InternalServerError("Error signing in")
     }
-    
 }

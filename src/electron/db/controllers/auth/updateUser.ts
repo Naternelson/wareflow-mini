@@ -5,18 +5,19 @@ import {
 	ForbiddenError,
 	InternalServerError,
 	UnauthorizedError,
-    UserPermission
+    UserPermission,
+    ApiRequest
 } from "../../../../common";
 import { logger } from "../../../logger";
 import { Organization, User } from "../../models";
 
-export const updateUser: RequestHandler = async (request): Promise<{ message: string }> => {
+export const updateUser: RequestHandler = async (request: ApiRequest<{firstName?: string, lastName?: string, email?: string, password?: string, id: number}>): Promise<{ message: string }> => {
 	const { meta, body } = request;
 	const { user, organization } = meta || {};
 	const { id } = body || {};
 	try {
 		validateRequest(user, organization, id);
-		const targetUser = await getTargetUser(user, organization, id);
+		const targetUser = await getTargetUser(user, organization, id as number);
 		if (!targetUser || targetUser.isSoftDeleted()) throw new BadRequestError("Invalid id", { id });
 		await updateFields(targetUser, body);
 		await targetUser.save();
@@ -28,7 +29,7 @@ export const updateUser: RequestHandler = async (request): Promise<{ message: st
 	}
 };
 
-const validateRequest = (user: User, organization: Organization, id: number) => {
+const validateRequest = (user: User, organization: Organization, id?: number) => {
 	if (!user || !(user instanceof User) || !organization || !(organization instanceof Organization)) {
 		throw new UnauthorizedError("Unauthorized token");
 	}
@@ -37,7 +38,7 @@ const validateRequest = (user: User, organization: Organization, id: number) => 
 		throw new BadRequestError("Invalid or missing id", { id });
 	}
 
-	if (user.id !== id && user.permission !== UserPermission.Admin && user.permission !== UserPermission.SuperAdmin) {
+	if (user.id !== id || (user.permission !== UserPermission.Admin && user.permission !== UserPermission.SuperAdmin)) {
 		throw new ForbiddenError("User does not have permission to update this user", {
 			id: user.id,
 			permission: user.permission,

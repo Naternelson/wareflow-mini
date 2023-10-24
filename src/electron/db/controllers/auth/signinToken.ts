@@ -1,11 +1,9 @@
-import { RequestHandler } from "../../../../common/api_controller";
-import { ApiError, InternalServerError, UnauthorizedError } from "../../../../common/api_error";
-import { AuthResponse } from "../../../../common/models";
-import { logger } from "../../../logger";
-import { Organization } from "../../models/organization";
-import { User } from "../../models/user";
 
-export const signinToken: RequestHandler = async (request): Promise<AuthResponse> => {
+import { logger } from "../../../logger";
+import { Organization, User } from "../../models";
+import { ApiError, InternalServerError, UnauthorizedError, AuthResponse, ApiRequest } from "../../../../common";
+
+export const signinToken =  async (request:ApiRequest<{}, AuthResponse>) => {
 	const { meta } = request;
 	const { user, organization } = meta || {};
 	try {

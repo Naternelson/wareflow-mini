@@ -21,6 +21,10 @@ export class User extends Model<InferAttributes<User>, InferCreationAttributes<U
 	static userPermissions = Object.values(UserPermission);
 	static emailPattern = /^\S+@\S+\.\S+$/;
 	static passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
+	static emailExists = async (email: string, organizationId: number) => {
+		const user = await User.findOne({where: {email, organizationId}});
+		return !user;
+	}
 	static findByToken = async (token: string, include?: Includeable | Includeable[]) => {
 		const decoded = verify(token, process.env.JWT_SECRET as string) as AuthToken;
 		const { userId, deleted } = decoded;
