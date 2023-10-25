@@ -12,8 +12,6 @@ import { Organization } from "./organization";
 import { Product } from "./product";
 import { cleanStringFieldsHooks } from "./utils/cleanStringFields";
 
-
-
 export class ProductGroup extends Model<InferAttributes<ProductGroup>, InferCreationAttributes<ProductGroup>> {
 	declare id: CreationOptional<number>;
 	declare name: string;
@@ -59,8 +57,6 @@ ProductGroup.init(
 	},
 	{
 		sequelize: sequelize,
-		modelName: "ProductGroup",
-		tableName: "productGroups",
 		timestamps: true,
 		paranoid: true,
 		indexes: [
@@ -75,23 +71,24 @@ ProductGroup.init(
 	}
 );
 
+export const associateProductGroup = () => {
+	//
+	// BELONGS TO RELATIONSHIPS
+	//
+	//When the organization is deleted, the product group should be deleted
+	ProductGroup.belongsTo(Organization, {
+		foreignKey: "organizationId",
+		as: "organization",
+		onDelete: "CASCADE",
+	});
 
-//
-// BELONGS TO RELATIONSHIPS
-//
-//When the organization is deleted, the product group should be deleted
-ProductGroup.belongsTo(Organization, {
-	foreignKey: "organizationId",
-	as: "organization",
-	onDelete: "CASCADE",
-});
-
-//
-// HAS MANY RELATIONSHIPS
-//
-// When the product group is deleted the products should NOT be deleted
-ProductGroup.hasMany(Product, {
-	foreignKey: "productGroupId",
-	as: "products",
-	onDelete: "SET NULL",
-});
+	//
+	// HAS MANY RELATIONSHIPS
+	//
+	// When the product group is deleted the products should NOT be deleted
+	ProductGroup.hasMany(Product, {
+		foreignKey: "productGroupId",
+		as: "products",
+		onDelete: "SET NULL",
+	});
+};

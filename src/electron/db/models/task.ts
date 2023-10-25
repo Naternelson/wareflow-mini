@@ -67,8 +67,6 @@ Task.init(
 	},
 	{
 		sequelize: sequelize,
-		modelName: "Task",
-		tableName: "tasks",
 		timestamps: true,
 		paranoid: true,
 		indexes: [
@@ -80,21 +78,22 @@ Task.init(
 		hooks: {},
 	}
 );
+export const associateTask = () => {
+	//
+	// BELONGS TO RELATIONSHIPS
+	//
+	TaskRelationship.belongsTo(TaskGroup, {
+		foreignKey: "taskGroupId",
+		as: "taskGroup",
+		onDelete: "CASCADE",
+	});
 
-//
-// BELONGS TO RELATIONSHIPS
-//
-Task.belongsTo(TaskGroup, {
-	foreignKey: "taskGroupId",
-	as: "taskGroup",
-	onDelete: "CASCADE",
-});
-
-//
-// HAS MANY RELATIONSHIPS
-//
-Task.hasMany(TaskRelationship, {
-	foreignKey: "taskId",
-	as: "taskRelationships",
-	onDelete: "CASCADE",
-});
+	//
+	// HAS MANY RELATIONSHIPS
+	//
+	TaskRelationship.hasMany(Task, {
+		foreignKey: "taskRelationshipId",
+		as: "tasks",
+		onDelete: "CASCADE",
+	});
+};

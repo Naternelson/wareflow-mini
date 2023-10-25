@@ -36,6 +36,7 @@ ProductItem.init(
 			allowNull: false,
 			defaultValue: 1,
 		},
+        
 		createdAt: {
 			type: DataTypes.DATE,
 			allowNull: false,
@@ -47,34 +48,34 @@ ProductItem.init(
 	},
 	{
 		sequelize: sequelize,
-		modelName: "ProductItem",
-		tableName: "productItems",
 		timestamps: true,
 		paranoid: true,
 	}
 );
 
-//
-// BELONGS TO RELATIONSHIPS
-//
-//When the product is deleted, the product item should be deleted
-ProductItem.belongsTo(Product, {
-	foreignKey: "productId",
-	as: "product",
-	onDelete: "CASCADE",
-});
+export const associateProductItem = () => {
+	//
+	// BELONGS TO RELATIONSHIPS
+	//
+	//When the product is deleted, the product item should be deleted
+	ProductItem.belongsTo(Product, {
+		foreignKey: "productId",
+		as: "product",
+		onDelete: "CASCADE",
+	});
 
-//
-// HAS MANY RELATIONSHIPS
-//
-//When the product item is deleted, the item identifiers should be deleted
-ProductItem.hasMany(ItemIdentifier, {
-	foreignKey: "productItemId",
-	as: "itemIdentifiers",
-	onDelete: "CASCADE",
-});
+	//
+	// HAS MANY RELATIONSHIPS
+	//
+	//When the product item is deleted, the item identifiers should be deleted
+	ProductItem.hasMany(ItemIdentifier, {
+		foreignKey: "productItemId",
+		as: "itemIdentifiers",
+		onDelete: "CASCADE",
+	});
 
-// ProductItem.hasMany(WorkflowLog, {
-//     foreignKey: "productItemId",
-//     as: "workflowLogs",
-// })
+	// ProductItem.hasMany(WorkflowLog, {
+	//     foreignKey: "productItemId",
+	//     as: "workflowLogs",
+	// })
+}

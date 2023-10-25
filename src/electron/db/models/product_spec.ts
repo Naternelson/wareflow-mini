@@ -1,9 +1,16 @@
-import { Model, DataTypes, CreationOptional, InferAttributes, InferCreationAttributes, NonAttribute, ForeignKey } from "sequelize";
+import {
+	Model,
+	DataTypes,
+	CreationOptional,
+	InferAttributes,
+	InferCreationAttributes,
+	NonAttribute,
+	ForeignKey,
+} from "sequelize";
 import { sequelize } from "../db";
 import { Product } from "./product";
 import { ItemIdentifier } from "./item_identifier";
 import { cleanStringFieldsHooks } from "./utils/cleanStringFields";
-
 
 export class ProductSpec extends Model<InferAttributes<ProductSpec>, InferCreationAttributes<ProductSpec>> {
 	declare id: CreationOptional<number>;
@@ -66,8 +73,6 @@ ProductSpec.init(
 	},
 	{
 		sequelize: sequelize,
-		modelName: "ProductSpec",
-		tableName: "productSpecs",
 		timestamps: true,
 		paranoid: true,
 		indexes: [
@@ -80,22 +85,24 @@ ProductSpec.init(
 	}
 );
 
-//
-// BELONGS TO RELATIONSHIPS
-//
-//When the product is deleted, the product spec should be deleted
-ProductSpec.belongsTo(Product, {
-	foreignKey: "productId",
-	as: "product",
-	onDelete: "CASCADE",
-});
+export const associateProductSpec = () => {
+	//
+	// BELONGS TO RELATIONSHIPS
+	//
+	//When the product is deleted, the product spec should be deleted
+	ProductSpec.belongsTo(Product, {
+		foreignKey: "productId",
+		as: "product",
+		onDelete: "CASCADE",
+	});
 
-//
-// HAS MANY RELATIONSHIPS
-//
-//When the product spec is deleted, the Item identifiers should be nullified
-ProductSpec.hasMany(ItemIdentifier, {
-	foreignKey: "productSpecId",
-	as: "productIdentifiers",
-	onDelete: "SET NULL",
-});
+	//
+	// HAS MANY RELATIONSHIPS
+	//
+	//When the product spec is deleted, the Item identifiers should be nullified
+	ProductSpec.hasMany(ItemIdentifier, {
+		foreignKey: "productSpecId",
+		as: "productIdentifiers",
+		onDelete: "SET NULL",
+	});
+};

@@ -14,7 +14,7 @@ import { Product } from "./product";
 import { TaskGroup } from "./task_group";
 
 type AssociationInstance = Product | null;
-const AssociatedTableNames = [Product.tableName];
+const AssociatedTableNames = ["products"];
 export class Workflow extends Model<InferAttributes<Workflow>, InferCreationAttributes<Workflow>> {
 	declare id: CreationOptional<number>;
 	declare name: string;
@@ -87,8 +87,6 @@ Workflow.init(
 	},
 	{
 		sequelize: sequelize,
-		modelName: "Workflow",
-		tableName: "workflows",
 		timestamps: true,
 		paranoid: true,
 		indexes: [
@@ -101,20 +99,22 @@ Workflow.init(
 	}
 );
 
-//
-// BELONGS TO RELATIONSHIPS
-//
-Workflow.belongsTo(Organization, {
-	foreignKey: "organizationId",
-	as: "organization",
-	onDelete: "CASCADE",
-});
+export const associateWorkflow = () => {
+	//
+	// BELONGS TO RELATIONSHIPS
+	//
+	Workflow.belongsTo(Organization, {
+		foreignKey: "organizationId",
+		as: "organization",
+		onDelete: "CASCADE",
+	});
 
-//
-// HAS MANY RELATIONSHIPS
-//
-Workflow.hasMany(TaskGroup, {
-	foreignKey: "workflowId",
-	as: "tasks",
-	onDelete: "CASCADE",
-});
+	//
+	// HAS MANY RELATIONSHIPS
+	//
+	Workflow.hasMany(TaskGroup, {
+		foreignKey: "workflowId",
+		as: "tasks",
+		onDelete: "CASCADE",
+	});
+};

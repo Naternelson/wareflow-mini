@@ -1,8 +1,8 @@
 import {
 	CreationOptional,
 	DataTypes,
+	FindOptions,
 	ForeignKey,
-	Includeable,
 	InferAttributes,
 	InferCreationAttributes,
 	Model,
@@ -10,9 +10,10 @@ import {
 } from "sequelize";
 import { Organization } from "./organization";
 import { sequelize } from "../db";
-import { sign, verify } from "jsonwebtoken";
+import { TokenExpiredError, sign, verify } from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { cleanStringFieldsHooks } from "./utils/cleanStringFields";
+import { TokenExpiredError as ApiTokenExpired, UnauthorizedError } from "../../../common";
 import { AuthToken, BasicUser, UserPermission } from "../../../common/models";
 import { LoginLog } from "./login_log";
 
@@ -20,16 +21,24 @@ const DefaultExpiry: string | number | undefined = "7d";
 export class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
 	static userPermissions = Object.values(UserPermission);
 	static emailPattern = /^\S+@\S+\.\S+$/;
-	static passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
+	static passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d!@#$%^&*()_+,-./:;<=>?@[\]^`{|}~]{8,}$/;
 	static emailExists = async (email: string, organizationId: number) => {
-		const user = await User.findOne({where: {email, organizationId}});
+		const user = await User.findOne({ where: { email, organizationId } });
 		return !user;
-	}
-	static findByToken = async (token: string, include?: Includeable | Includeable[]) => {
-		const decoded = verify(token, process.env.JWT_SECRET as string) as AuthToken;
+	};
+	static decodeToken = (token: string) => {
+		try {
+			return verify(token, process.env.JWT_SECRET as string) as AuthToken;
+		} catch (error) {
+			if (error instanceof TokenExpiredError) throw new ApiTokenExpired("Token expired");
+			throw new UnauthorizedError("Invalid token");
+		}
+	};
+	static findByToken = async (token: string, options?:FindOptions) => {
+		const decoded = this.decodeToken(token);
 		const { userId, deleted } = decoded;
 		if (!userId || !!deleted) return null;
-		return User.findByPk(userId, { include });
+		return User.findByPk(userId, options);
 	};
 
 	declare id: CreationOptional<number>;
@@ -75,15 +84,21 @@ export class User extends Model<InferAttributes<User>, InferCreationAttributes<U
 			organizationId: this.organizationId,
 			deleted: this.isSoftDeleted(),
 		};
-		return sign(tokenInformation,
-			process.env.JWT_SECRET as string,
-			{ expiresIn: expiry }
-		);
+		return sign(tokenInformation, process.env.JWT_SECRET as string, { expiresIn: expiry });
 	};
 	sanitize = (): BasicUser => {
-		const {password, passwordHashed, ...safeProps} = this.toJSON();
-		return safeProps;
-	}
+		const { password, passwordHashed, ...safeProps } = this.toJSON();
+		return {
+			id: safeProps.id,
+			firstName: safeProps.firstName,
+			lastName: safeProps.lastName,
+			permission: safeProps.permission,
+			email: safeProps.email,
+			createdAt: safeProps.createdAt,
+			updatedAt: safeProps.updatedAt,
+			organizationId: safeProps.organizationId,
+		};
+	};
 }
 
 User.init(
@@ -113,7 +128,7 @@ User.init(
 			type: DataTypes.VIRTUAL,
 			allowNull: false,
 			validate: {
-				is: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/,
+				is: User.passwordPattern,
 			},
 		},
 		passwordHashed: {
@@ -145,7 +160,6 @@ User.init(
 	},
 	{
 		sequelize,
-		modelName: "users",
 		paranoid: true,
 		indexes: [
 			{
@@ -165,10 +179,17 @@ User.init(
 		},
 	}
 );
+export const associateUser = () => {
+	//User should be deleted if the organization is deleted
+	User.belongsTo(Organization, {
+		foreignKey: "organizationId",
+		as: "organization",
+		onDelete: "CASCADE",
+	});
 
-//User should be deleted if the organization is deleted
-User.belongsTo(Organization, {
-	foreignKey: "organizationId",
-	as: "organization",
-	onDelete: "CASCADE",
-});
+	User.hasMany(LoginLog, {
+		foreignKey: "userId",
+		as: "loginLogs",
+		onDelete: "CASCADE",
+	});
+};

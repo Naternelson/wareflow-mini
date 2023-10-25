@@ -1,11 +1,19 @@
-import { DataTypes, Model, InferAttributes, InferCreationAttributes, CreationOptional, ForeignKey, NonAttribute } from "sequelize";
+import {
+	DataTypes,
+	Model,
+	InferAttributes,
+	InferCreationAttributes,
+	CreationOptional,
+	ForeignKey,
+	NonAttribute,
+} from "sequelize";
 import { sequelize } from "../db";
 import { Task } from "./task";
 import { TaskGroup } from "./task_group";
 import { Organization } from "./organization";
 import { User } from "./user";
 import { TaskRelationship } from "./task_relationship";
-
+import { OrderItem } from "./order_item";
 
 export class TaskLog extends Model<InferAttributes<TaskLog>, InferCreationAttributes<TaskLog>> {
 	declare id: CreationOptional<number>;
@@ -76,8 +84,6 @@ TaskLog.init(
 	},
 	{
 		sequelize: sequelize,
-		modelName: "TaskLog",
-		tableName: "taskLogs",
 		timestamps: true,
 		paranoid: true,
 		indexes: [
@@ -90,29 +96,31 @@ TaskLog.init(
 	}
 );
 
-//
-// BELONGS TO RELATIONSHIPS
-//
-TaskLog.belongsTo(Task, {
-	foreignKey: "taskId",
-	as: "task",
-	// onDelete: "CASCADE",
-});
+export const associateTaskLog = () => {
+	//
+	// BELONGS TO RELATIONSHIPS
+	//
+	TaskLog.belongsTo(Task, {
+		foreignKey: "taskId",
+		as: "task",
+		// onDelete: "CASCADE",
+	});
 
-TaskLog.belongsTo(TaskGroup, {
-	foreignKey: "taskGroupId",
-	as: "taskGroup",
-	// onDelete: "CASCADE",
-});
+	TaskLog.belongsTo(TaskGroup, {
+		foreignKey: "taskGroupId",
+		as: "taskGroup",
+		// onDelete: "CASCADE",
+	});
 
-TaskLog.belongsTo(Organization, {
-	foreignKey: "organizationId",
-	as: "organization",
-	// onDelete: "CASCADE",
-});
+	TaskLog.belongsTo(Organization, {
+		foreignKey: "organizationId",
+		as: "organization",
+		// onDelete: "CASCADE",
+	});
 
-TaskLog.belongsTo(User, {
-	foreignKey: "userId",
-	as: "user",
-	// onDelete: "CASCADE",
-});
+	TaskLog.belongsTo(User, {
+		foreignKey: "userId",
+		as: "user",
+		// onDelete: "CASCADE",
+	});
+};

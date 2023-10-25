@@ -10,7 +10,7 @@ import {
 import { sequelize } from "../db";
 import { Task } from "./task";
 import { TaskRelationship } from "./task_relationship";
-import {Workflow} from "./workflow"
+import { Workflow } from "./workflow";
 import { cleanStringFieldsHooks } from "./utils/cleanStringFields";
 
 export class TaskGroup extends Model<InferAttributes<TaskGroup>, InferCreationAttributes<TaskGroup>> {
@@ -60,8 +60,6 @@ TaskGroup.init(
 	},
 	{
 		sequelize: sequelize,
-		modelName: "TaskGroup",
-		tableName: "taskGroups",
 		timestamps: true,
 		paranoid: true,
 		indexes: [
@@ -74,26 +72,28 @@ TaskGroup.init(
 	}
 );
 
-//
-// BELONGS TO RELATIONSHIPS
-//
-TaskGroup.belongsTo(Workflow, {
-	foreignKey: "workflowId",
-	as: "workflow",
-	onDelete: "CASCADE",
-});
+export const associateTaskGroup = () => {
+	//
+	// BELONGS TO RELATIONSHIPS
+	//
+	TaskGroup.belongsTo(Workflow, {
+		foreignKey: "workflowId",
+		as: "workflow",
+		onDelete: "CASCADE",
+	});
 
-//
-// HAS MANY RELATIONSHIPS
-//
-TaskGroup.hasMany(Task, {
-	foreignKey: "taskGroupId",
-	as: "tasks",
-	onDelete: "CASCADE",
-});
+	//
+	// HAS MANY RELATIONSHIPS
+	//
+	TaskGroup.hasMany(Task, {
+		foreignKey: "taskGroupId",
+		as: "tasks",
+		onDelete: "CASCADE",
+	});
 
-TaskGroup.hasMany(TaskRelationship, {
-	foreignKey: "taskGroupId",
-	as: "taskRelationships",
-	onDelete: "CASCADE",
-});
+	TaskGroup.hasMany(TaskRelationship, {
+		foreignKey: "taskGroupId",
+		as: "taskRelationships",
+		onDelete: "CASCADE",
+	});
+};

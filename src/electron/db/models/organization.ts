@@ -58,13 +58,16 @@ Organization.init(
 	},
 	{
 		sequelize: sequelize,
-		tableName: "organizations",
 		paranoid: true,
 	}
 );
 
+
+
+export const associateOrganization = () => {
 Organization.hasMany(User, {
 	foreignKey: "organizationId",
 	as: "users",
 	onDelete: "CASCADE",
 });
+};

@@ -14,7 +14,7 @@ export const userFromTokenMiddleware = async (request: ApiRequest<any, any>): Pr
 	if (typeof token !== "string") return request;
 
 	// Validate and find the user
-	const user = await User.findByToken(token, Organization);
+	const user = await User.findByToken(token, {include: {model: Organization, as: "organization"}});
 	if (!user) return request;
 
 	// Attach user and organization to request meta

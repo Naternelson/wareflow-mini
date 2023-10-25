@@ -1,8 +1,15 @@
-import { DataTypes, Model, InferAttributes, InferCreationAttributes, CreationOptional, NonAttribute, ForeignKey } from "sequelize";
+import {
+	DataTypes,
+	Model,
+	InferAttributes,
+	InferCreationAttributes,
+	CreationOptional,
+	NonAttribute,
+	ForeignKey,
+} from "sequelize";
 import { sequelize } from "../db";
 import { Task } from "./task";
 import { TaskGroup } from "./task_group";
-
 
 export class TaskRelationship extends Model<
 	InferAttributes<TaskRelationship>,
@@ -81,8 +88,6 @@ TaskRelationship.init(
 	},
 	{
 		sequelize: sequelize,
-		modelName: "TaskRelationship",
-		tableName: "taskRelationships",
 		timestamps: true,
 		paranoid: true,
 		indexes: [
@@ -95,20 +100,37 @@ TaskRelationship.init(
 	}
 );
 
-//
-// BELONGS TO RELATIONSHIPS
-//
-TaskRelationship.belongsTo(TaskGroup, {
-	foreignKey: "taskGroupId",
-	as: "taskGroup",
-	onDelete: "CASCADE",
-});
+export const associateTaskRelationship = () => {
+	//
+	// BELONGS TO RELATIONSHIPS
+	//
+	TaskRelationship.belongsTo(TaskGroup, {
+		foreignKey: "targetTaskGroupId",
+		as: "targetTaskGroup",
+		onDelete: "CASCADE",
+	});
+	TaskRelationship.belongsTo(Task, {
+		foreignKey: "targetTaskId",
+		as: "targetTask",
+		onDelete: "CASCADE",
+	});
+	TaskRelationship.belongsTo(TaskGroup, {
+		foreignKey: "nextTaskGroupId",
+		as: "nextTaskGroup",
+		onDelete: "CASCADE",
+	});
+	TaskRelationship.belongsTo(Task, {
+		foreignKey: "nextTaskId",
+		as: "nextTask",
+		onDelete: "CASCADE",
+	});
 
-//
-// HAS MANY RELATIONSHIPS
-//
-TaskRelationship.hasMany(Task, {
-	foreignKey: "taskRelationshipId",
-	as: "tasks",
-	onDelete: "CASCADE",
-});
+	// //
+	// // HAS MANY RELATIONSHIPS
+	// //
+	// TaskRelationship.hasMany(Task, {
+	// 	foreignKey: "taskRelationshipId",
+	// 	as: "tasks",
+	// 	onDelete: "CASCADE",
+	// });
+};

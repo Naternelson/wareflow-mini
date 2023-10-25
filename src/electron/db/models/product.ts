@@ -73,8 +73,6 @@ Product.init(
 	},
 	{
 		sequelize: sequelize,
-		modelName: "Product",
-		tableName: "products",
 		timestamps: true,
 		paranoid: true,
 		indexes: [
@@ -87,44 +85,46 @@ Product.init(
 	}
 );
 
-//
-// BELONGS TO RELATIONSHIPS
-//
-Product.belongsTo(ProductGroup, {
-	foreignKey: "productGroupId",
-	as: "productGroup",
-});
-//When the organization is deleted, the product should be deleted
-Product.belongsTo(Organization, {
-	foreignKey: "organizationId",
-	as: "organization",
-	onDelete: "CASCADE",
-});
+export const associateProduct = () => {
+	//
+	// BELONGS TO RELATIONSHIPS
+	//
+	Product.belongsTo(ProductGroup, {
+		foreignKey: "productGroupId",
+		as: "productGroup",
+	});
+	//When the organization is deleted, the product should be deleted
+	Product.belongsTo(Organization, {
+		foreignKey: "organizationId",
+		as: "organization",
+		onDelete: "CASCADE",
+	});
 
-//
-// HAS MANY RELATIONSHIPS
-//
-Product.hasMany(Workflow, {
-	foreignKey: "workflowId",
-	as: "workflow",
-	onDelete: "CASCADE",
-});
+	//
+	// HAS MANY RELATIONSHIPS
+	//
+	Product.hasMany(Workflow, {
+		foreignKey: "workflowId",
+		as: "workflow",
+		onDelete: "CASCADE",
+	});
 
-Product.hasMany(ProductSpec, {
-	foreignKey: "productId",
-	as: "productSpecs",
-	onDelete: "CASCADE",
-});
+	Product.hasMany(ProductSpec, {
+		foreignKey: "productId",
+		as: "productSpecs",
+		onDelete: "CASCADE",
+	});
 
-//When product is deleted, the product identifiers should be deleted
-Product.hasMany(ProductIdentifier, {
-	foreignKey: "productId",
-	as: "productIdentifiers",
-	onDelete: "CASCADE",
-});
+	//When product is deleted, the product identifiers should be deleted
+	Product.hasMany(ProductIdentifier, {
+		foreignKey: "productId",
+		as: "productIdentifiers",
+		onDelete: "CASCADE",
+	});
 
-Product.hasMany(ProductItem, {
-	foreignKey: "productId",
-	as: "productItems",
-	onDelete: "CASCADE",
-});
+	Product.hasMany(ProductItem, {
+		foreignKey: "productId",
+		as: "productItems",
+		onDelete: "CASCADE",
+	});
+};
