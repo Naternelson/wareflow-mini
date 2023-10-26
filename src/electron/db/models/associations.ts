@@ -1,7 +1,8 @@
-import "./index"
+import "./index";
 import { associateItemIdentifier } from "./item_identifier";
 import { associateLoginLog } from "./login_log";
 import { associateOrder } from "./order";
+import { associateBin } from "./bin";
 import { associateOrderIdentifier } from "./order_identifier";
 import { associateOrderItem } from "./order_item";
 import { associateOrganization } from "./organization";
@@ -17,20 +18,21 @@ import { associateTaskRelationship } from "./task_relationship";
 import { associateUser } from "./user";
 import { associateWorkflow } from "./workflow";
 
-associateItemIdentifier()
-associateLoginLog()
-associateOrderIdentifier()
-associateOrderItem()
-associateOrder()
-associateOrganization()
-associateProduct()
-associateProductGroup()
-associateProductIdentifier() 
-associateProductItem() 
-associateProductSpec() 
-associateTask() 
-associateTaskGroup() 
-associateTaskLog() 
-associateTaskRelationship() 
-associateUser()
-associateWorkflow() 
+associateItemIdentifier();
+associateLoginLog();
+associateOrderIdentifier();
+associateOrderItem();
+associateOrder();
+associateOrganization();
+associateProduct();
+associateProductGroup();
+associateProductIdentifier();
+associateProductItem();
+associateProductSpec();
+associateTask();
+associateTaskGroup();
+associateTaskLog();
+associateTaskRelationship();
+associateUser();
+associateWorkflow();
+associateBin();

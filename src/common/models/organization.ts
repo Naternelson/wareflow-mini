@@ -4,3 +4,4 @@ export type BasicOrganization = {
 	createdAt: Date;
 	updatedAt: Date;
 };
+

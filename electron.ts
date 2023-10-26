@@ -5,6 +5,8 @@ import installExtension, { REDUX_DEVTOOLS } from "electron-devtools-installer";
 import { config } from "dotenv";
 import "./src/electron/db/entry";
 import { sequelize } from "./src/electron/db/db";
+import { clearDB } from "./src/electron/db/dev-actions/clearDB";
+import { SeedDb } from "./src/electron/db/dev-actions/seed";
 config();
 
 let mainWindow: BrowserWindow | null;
@@ -20,13 +22,25 @@ function createWindow() {
 			preload: path.join(__dirname, "public", "preload.js"),
 		},
 	});
-	console.log(Menu.getApplicationMenu());
-	Menu.getApplicationMenu()?.items[0].submenu?.insert(
+	const FileMenuItems = Menu.getApplicationMenu()?.items[0].submenu
+	
+	FileMenuItems?.insert(
 		0,
 		new MenuItem({
-			label: "Seed DB",
+			label: "Wipe DB",
 			click: () => {
-				console.log("Seed DB...");
+				clearDB();
+				mainWindow?.reload();
+			},
+		})
+	);
+	FileMenuItems?.insert(
+		0,
+		new MenuItem({
+			label: "SeedDB",
+			click: () => {
+				SeedDb();
+				mainWindow?.reload();
 			},
 		})
 	);

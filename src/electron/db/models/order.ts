@@ -7,6 +7,7 @@ export class Order extends Model<InferAttributes<Order>, InferCreationAttributes
 	declare id: CreationOptional<number>;
 	declare organizationId: number;
 	declare orderedOn: Date;
+	declare customer: string;
 	declare dueBy: Date;
 	declare createdAt: CreationOptional<Date>;
 	declare updatedAt: CreationOptional<Date>;
@@ -29,7 +30,10 @@ Order.init(
 		},
 		dueBy: {
 			type: DataTypes.DATE,
-			allowNull: true,
+		},
+		customer: {
+			type: DataTypes.STRING,
+			allowNull: false,
 		},
 		createdAt: {
 			type: DataTypes.DATE,

@@ -2,13 +2,15 @@ import { CreationOptional, DataTypes, ForeignKey, InferAttributes, InferCreation
 import { sequelize } from "../db";
 import { Order } from "./order";
 import { Product } from "./product";
+import { OrderItemStatus } from "../../../common";
 
 export class OrderItem extends Model<InferAttributes<OrderItem>, InferCreationAttributes<OrderItem>> {
 	declare id: CreationOptional<number>;
 	declare orderId: ForeignKey<number>;
 	declare productId: ForeignKey<number>;
 	declare quantity: number;
-	declare quantityUnit: string;
+	declare unit: string;
+	declare status: string; 
 	declare createdAt: CreationOptional<Date>;
 	declare updatedAt: CreationOptional<Date>;
 }
@@ -36,10 +38,15 @@ OrderItem.init(
 			type: DataTypes.INTEGER.UNSIGNED,
 			allowNull: false,
 		},
-		quantityUnit: {
+		unit: {
 			type: DataTypes.STRING,
 			allowNull: false,
 			defaultValue: "unit",
+		},
+		status: {
+			type: DataTypes.ENUM(...Object.values(OrderItemStatus)),
+			allowNull: false,
+			defaultValue: OrderItemStatus.PENDING,
 		},
 		createdAt: {
 			type: DataTypes.DATE,

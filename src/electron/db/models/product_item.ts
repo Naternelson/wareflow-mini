@@ -1,7 +1,16 @@
-import { CreationOptional, DataTypes, ForeignKey, InferAttributes, InferCreationAttributes, Model, NonAttribute } from "sequelize";
+import {
+	CreationOptional,
+	DataTypes,
+	ForeignKey,
+	InferAttributes,
+	InferCreationAttributes,
+	Model,
+	NonAttribute,
+} from "sequelize";
 import { Product } from "./product";
 import { sequelize } from "../db";
 import { ItemIdentifier } from "./item_identifier";
+import { Bin } from "./bin";
 
 // The product Item is the actual item that is tracked in inventory
 export class ProductItem extends Model<InferAttributes<ProductItem>, InferCreationAttributes<ProductItem>> {
@@ -11,6 +20,8 @@ export class ProductItem extends Model<InferAttributes<ProductItem>, InferCreati
 	declare readonly updatedAt: CreationOptional<Date>;
 	declare productId: ForeignKey<Product["id"]>;
 	declare product?: NonAttribute<Product>;
+	declare binId: ForeignKey<number>;
+	declare bin: NonAttribute<Bin>;
 	declare itemIdentifiers: NonAttribute<ItemIdentifier[]>;
 	// declare workflowLogs: NonAttribute<WorkflowLog[]>;
 }
@@ -30,13 +41,21 @@ ProductItem.init(
 				key: "id",
 			},
 		},
+		binId: {
+			type: DataTypes.INTEGER.UNSIGNED,
+			allowNull: true,
+			references: {
+				model: "bins",
+				key: "id",
+			},
+		},
 		quantity: {
 			// Represents the number of units of the product that this item represents. For instance you may not need to track every unit, but you do need to track a number in a LOT
 			type: DataTypes.INTEGER.UNSIGNED,
 			allowNull: false,
 			defaultValue: 1,
 		},
-        
+
 		createdAt: {
 			type: DataTypes.DATE,
 			allowNull: false,
@@ -63,6 +82,11 @@ export const associateProductItem = () => {
 		as: "product",
 		onDelete: "CASCADE",
 	});
+	ProductItem.belongsTo(Bin, {
+		foreignKey: "binId",
+		as: "bin",
+		onDelete: "SET NULL",
+	});
 
 	//
 	// HAS MANY RELATIONSHIPS
@@ -78,4 +102,4 @@ export const associateProductItem = () => {
 	//     foreignKey: "productItemId",
 	//     as: "workflowLogs",
 	// })
-}
+};
