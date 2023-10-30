@@ -11,7 +11,9 @@ import {
 import { logger } from "../../../logger";
 import { Organization, User } from "../../models";
 
-export const updateUser: RequestHandler = async (request: ApiRequest<{firstName?: string, lastName?: string, email?: string, password?: string, id: number}>): Promise<{ message: string }> => {
+
+
+export const updateUser: RequestHandler = async (request: ApiRequest): Promise<{message: string}> => {
 	const { meta, body } = request;
 	const { user, organization } = meta || {};
 	const { id } = body || {};

@@ -11,7 +11,7 @@ import {OrderListResponse} from "../../../common";
 // 	SanitizedProduct,
 // } from "../../../common/order";
 import { OrdersList } from "./OrderList";
-import { faker } from "@faker-js/faker";
+
 
 export const Home = () => {
 	const { orgNameProps } = useDashboardHooks();

@@ -1,4 +1,3 @@
-import { ProductIdentifier } from "../../electron/db/models";
 import { BasicBin } from "./bin";
 import { BasicOrderIdentifier } from "./order-identifier";
 import { BasicOrderItem } from "./order-item";

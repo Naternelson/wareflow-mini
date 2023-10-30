@@ -13,19 +13,7 @@ import {
 import { logger } from "../../../logger";
 import { Organization, User } from "../../models";
 
-export const createUser = async (
-	request: ApiRequest<
-		{
-			firstName: string;
-			lastName: string;
-			email: string;
-			password: string;
-			organizationId?: number;
-			permission: UserPermission;
-		},
-		AuthResponse
-	>
-) => {
+export const createUser = async (request: ApiRequest) => {
 	try {
 		const { meta, body } = request;
 		const { user, organization } = meta || {};
@@ -77,7 +65,7 @@ const validateRequest = (user: User, organization: Organization, targetOrgId: nu
 // Function to validate the fields in the request body
 const validateFields = async (body: Partial<BasicUser> & { password?: string }) => {
 	const { firstName, lastName, email, password, organizationId, permission } = body;
-    
+
 	// Check for any missing required fields
 	const missingFields = findMissingFields({ firstName, lastName, email, password, permission, organizationId });
 

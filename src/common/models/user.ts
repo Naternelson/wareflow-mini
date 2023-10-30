@@ -31,3 +31,27 @@ export interface AuthResponse {
 		organization: BasicOrganization;
 	};
 }
+
+export interface SigninUserBody {
+    email: string;
+    password: string;
+    organizationId: number | null
+}
+
+export interface SigninTokenBody {}
+
+export interface UpdateUserBody {
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    password?: string;
+}
+
+export interface CreateUserBody {
+    firstName: string;
+    lastName: string;
+    email: string;
+    password: string;
+    organizationId: number;
+    permission: UserPermission;
+}

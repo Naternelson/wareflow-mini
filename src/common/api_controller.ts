@@ -1,7 +1,8 @@
 import { ApiRequest } from "./api_request";
 import { toCamelCase } from "./string_helper";
 
-export type RequestHandler = (request: ApiRequest<any, any>) => Promise<any>;
+
+export type RequestHandler= (request: ApiRequest) => Promise<unknown>;
 type Controller =  {
     add: (name: string, handler: RequestHandler) => void;
     get: (name: string) => RequestHandler | undefined;

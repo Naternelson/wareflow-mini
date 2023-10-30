@@ -2,14 +2,14 @@ import { ApiRequest } from "../../../common/api_request";
 import { Organization } from "../models/organization";
 import { User } from "../models/user";
 
-export const userFromTokenMiddleware = async (request: ApiRequest<any, any>): Promise<ApiRequest<any, any>> => {
+export const userFromTokenMiddleware = async (request: ApiRequest): Promise<ApiRequest> => {
 	// Extract authorization header
 	const { headers } = request;
-	const { authorization } = headers || {};
+	const { Authorization } = headers || {};
 
 	// Validate authorization type
-	if (typeof authorization !== "string") return request;
-	const [type, token] = authorization.split(" ");
+	if (typeof Authorization !== "string") return request;
+	const [type, token] = Authorization.split(" ");
 	if (type !== "Bearer") return request;
 	if (typeof token !== "string") return request;
 

@@ -1,10 +1,10 @@
 import { IpcRenderer } from "electron";
 import axios, { AxiosRequestConfig } from "axios";
-export interface ApiRequest <B = unknown, R extends object = {}>{
+export interface ApiRequest{
     method?: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
     resource: string; // The endpoint to hit
-    body?: B; // The body of the request
-    expectedResponse?: new () => R; // The expected response type
+    body?: any; // The body of the request
+    expectedResponse?: (response: any) => boolean // The expected response type
     headers?: Record<string, string>; // Any additional headers to send
     params?: Record<string, string>; // Any query params to send
     timeout?: number; // The timeout for the request in milliseconds 
@@ -12,9 +12,11 @@ export interface ApiRequest <B = unknown, R extends object = {}>{
     _shape: "ApiRequest"; // This is used to ensure that the type is correct 
 }
 
+
+
 export function createApiRequest (ipcRenderer: IpcRenderer, baseUrl?: string) {
     return {
-        axios: async <B, R extends object>(request: ApiRequest<B, R>) => {
+        axios: async (request: ApiRequest) => {
             try {
                 const axiosRequest: AxiosRequestConfig = {
                     method: request.method || "GET",
@@ -26,11 +28,11 @@ export function createApiRequest (ipcRenderer: IpcRenderer, baseUrl?: string) {
                 };
                 const response = await axios(axiosRequest);
                 if (request.expectedResponse) {
-                    const expectedResponse = new request.expectedResponse();
-                    if (response.data) {
-                        Object.assign(expectedResponse as object, response.data);
+                    const expectedResponse = request.expectedResponse(response.data);
+                    if (expectedResponse) {
+                        return expectedResponse;
                     }
-                    return expectedResponse;
+                    throw new Error("Unexpected response");
                 }
                 return response.data;
             } catch (error) {
@@ -38,16 +40,16 @@ export function createApiRequest (ipcRenderer: IpcRenderer, baseUrl?: string) {
                 throw error;
             }
         },
-        invoke: async <B, R extends object>(request: ApiRequest<B, R>) => {
+        invoke: async (request: ApiRequest) => {
             try {
                 const response = await ipcRenderer.invoke("api-call", request);
                 if (request.expectedResponse) {
-                    const expectedResponse = new request.expectedResponse();
-                    if (response.data) {
-                        Object.assign(expectedResponse as object, response.data);
-                    }
-                    return expectedResponse;
-                }
+					const expectedResponse = request.expectedResponse(response.data);
+					if (expectedResponse) {
+						return expectedResponse;
+					}
+					throw new Error("Unexpected response");
+				}
                 return response.data;
             } catch (error) {
                 console.error("IPC Renderer Error", error);
