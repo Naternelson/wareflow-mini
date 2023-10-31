@@ -6,3 +6,5 @@ export * from "./styled_flex";
 export * from "./animations";
 export * from "./status-indicator";
 export * from "./search-bar";
+
+export * from "./password_field";

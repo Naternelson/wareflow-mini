@@ -16,7 +16,7 @@ const MissingUserMessage = "No user or organization was found"
 export const signinUser: RequestHandler = async (request: ApiRequest): Promise<AuthResponse> => {
 	const { email, password, organizationId } = request.body || {};
 	// Check for required fields
-	const missingFields = findMissingFields({ email, password, organizationId });
+	const missingFields = findMissingFields({ email, password });
 	if (missingFields.length) throw new BadRequestError("Missing required fields", { missingFields });
 	// Check for valid fields
 	if (typeof email !== "string") throw new BadRequestError("Invalid email", { email });

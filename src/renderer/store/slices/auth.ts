@@ -1,13 +1,16 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { AuthResponse, BasicOrganization, BasicUser, CreateUserBody, SigninTokenBody, SigninUserBody, UpdateUserBody } from "../../../common";
-import { ipcRenderer } from "electron";
+// import { ipcRenderer } from "electron";
 import { createApiThunk } from "../utils/createApiThunk";
+import { RootState } from ".";
+import { useSelector } from "react-redux";
+import { DToS, DeepDateToString } from "../utils/serializedType";
 
-interface AuthState {
+export interface AuthState {
 	status: "idle" | "pending" | "loading" | "success" | "error";
 	token: string | null;
-	user: BasicUser | null;
-	organization: BasicOrganization | null;
+	user: DeepDateToString<BasicUser> | null;
+	organization: DeepDateToString<BasicOrganization> | null;
 	error: string | null;
 }
 
@@ -19,10 +22,11 @@ const initialState: AuthState = {
 	error: null,
 };
 
-export const signin = createApiThunk<SigninUserBody>("auth/signin", ipcRenderer);
-export const signinToken = createApiThunk<SigninTokenBody>("auth/signinToken", ipcRenderer)
-export const updateUser = createApiThunk<UpdateUserBody>("auth/updateUser", ipcRenderer)
-export const createUser = createApiThunk<CreateUserBody>("auth/createUser", ipcRenderer)
+
+export const signin = createApiThunk<SigninUserBody>("auth/signin");
+export const signinToken = createApiThunk<SigninTokenBody>("auth/signinToken")
+export const updateUser = createApiThunk<UpdateUserBody>("auth/updateUser")
+export const createUser = createApiThunk<CreateUserBody>("auth/createUser")
 
 const authSlice = createSlice({
 	name: "auth",
@@ -49,7 +53,7 @@ const authSlice = createSlice({
 	},
 });
 
-const fulfilledAuthReducer = (state: AuthState, action: PayloadAction<AuthResponse>) => {
+const fulfilledAuthReducer = (state: AuthState, action: PayloadAction<DToS<AuthResponse>>) => {
     state.status = "success";
     state.token = action.payload.data.token;
     state.user = action.payload.data.user;
@@ -69,3 +73,5 @@ const rejectedAuthReducer = (state: AuthState, action: PayloadAction<any>) => {
 
 
 export const authReducer = authSlice.reducer;
+
+export const useAuthSelector = () =>  useSelector<RootState, AuthState>((state) => state.auth);

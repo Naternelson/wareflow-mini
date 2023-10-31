@@ -3,7 +3,12 @@ import "./models/associations";
 import "./main_request_listener"
 
 const init = async () => {
-	await sequelize.sync()
+	try {
+		await sequelize.sync()
+
+	} catch (error) {
+		console.error("Error initializing database", error)
+	}
 };
 
 init();

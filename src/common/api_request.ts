@@ -4,7 +4,6 @@ export interface ApiRequest{
     method?: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
     resource: string; // The endpoint to hit
     body?: any; // The body of the request
-    expectedResponse?: (response: any) => boolean // The expected response type
     headers?: Record<string, string>; // Any additional headers to send
     params?: Record<string, string>; // Any query params to send
     timeout?: number; // The timeout for the request in milliseconds 
@@ -14,7 +13,7 @@ export interface ApiRequest{
 
 
 
-export function createApiRequest (ipcRenderer: IpcRenderer, baseUrl?: string) {
+export function createApiRequest (invokeFn: IpcRenderer["invoke"], baseUrl?: string) {
     return {
         axios: async (request: ApiRequest) => {
             try {
@@ -27,14 +26,7 @@ export function createApiRequest (ipcRenderer: IpcRenderer, baseUrl?: string) {
                     timeout: request.timeout,
                 };
                 const response = await axios(axiosRequest);
-                if (request.expectedResponse) {
-                    const expectedResponse = request.expectedResponse(response.data);
-                    if (expectedResponse) {
-                        return expectedResponse;
-                    }
-                    throw new Error("Unexpected response");
-                }
-                return response.data;
+                return response;
             } catch (error) {
                 console.error("Axios Error", error);
                 throw error;
@@ -42,15 +34,8 @@ export function createApiRequest (ipcRenderer: IpcRenderer, baseUrl?: string) {
         },
         invoke: async (request: ApiRequest) => {
             try {
-                const response = await ipcRenderer.invoke("api-call", request);
-                if (request.expectedResponse) {
-					const expectedResponse = request.expectedResponse(response.data);
-					if (expectedResponse) {
-						return expectedResponse;
-					}
-					throw new Error("Unexpected response");
-				}
-                return response.data;
+                const response = await invokeFn("api-call", request);
+                return response;
             } catch (error) {
                 console.error("IPC Renderer Error", error);
                 throw error;

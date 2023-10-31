@@ -1,11 +1,13 @@
-import { AppBar, Box, Toolbar, Typography, TypographyProps, ButtonBase, ButtonBaseProps, styled } from "@mui/material";
+import React, { useEffect } from "react";
+import { Box, Toolbar, styled } from "@mui/material";
 import { Outlet, useNavigate } from "react-router-dom";
-import { StyledColumn, StyledRow } from "../../components";
-import { ArrowDropDown, Home } from "@mui/icons-material";
-
+import { NavBar } from "./NavBar";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store/slices";
+import { AuthState } from "../../store/slices/auth";
 export const ProtectedLayout = () => {
 	// Implement your own Protected Layout here
-
+	useProtectedLayout()
 	return (
 		<ViewBoxContainer>
 			<NavBar />
@@ -24,75 +26,12 @@ const ViewBoxContainer = styled(Box)(({ theme }) => ({
 	color: theme.palette.text.primary,
 }));
 
-const NavBar = () => {
-	const { siteNameButtonProps, siteNameProps, orgNameButtonProps, orgNameProps } = useNavBarHooks();
-	return (
-		<AppBar position="fixed">
-			<Toolbar>
-				<StyledColumn gap={".5rem"}>
-					<StyledRow gap={"1rem"}>
-						<ButtonBase {...siteNameButtonProps}>
-							<Typography {...siteNameProps} />
-						</ButtonBase>
-						<ButtonBase {...orgNameButtonProps}>
-							<Typography {...orgNameProps} />
-						</ButtonBase>
-					</StyledRow>
-					<StyledRow gap={"2rem"}>
-						<ButtonBase style={{ alignItems: "center", gap: ".25rem" }}>
-							<Home fontSize="small" />
-							<Typography variant="body1">Home</Typography>
-							<ArrowDropDown fontSize="small" />
-						</ButtonBase>
-						<ButtonBase>
-							<Typography variant="body1">Orders</Typography>
-							<ArrowDropDown fontSize="small" />
-						</ButtonBase>
-						<ButtonBase>
-							<Typography variant="body1">Products</Typography>
-							<ArrowDropDown fontSize="small" />
-						</ButtonBase>
-						<ButtonBase>
-							<Typography variant="body1">Labels</Typography>
-							<ArrowDropDown fontSize="small" />
-						</ButtonBase>
-					</StyledRow>
-				</StyledColumn>
-			</Toolbar>
-		</AppBar>
-	);
-};
-
-const useNavBarHooks = (): {
-	siteNameButtonProps: ButtonBaseProps;
-	siteNameProps: TypographyProps;
-	orgNameButtonProps: ButtonBaseProps;
-	orgNameProps: TypographyProps;
-} => {
+export const useProtectedLayout = () => {
+	const { token, status } = useSelector<RootState, AuthState>((state) => state.auth);
 	const nav = useNavigate();
-	const handleSiteNameClick = () => {
-		nav("/");
-	};
-	return {
-		siteNameButtonProps: {
-			onClick: handleSiteNameClick,
-			disableRipple: true,
-		},
-		siteNameProps: {
-			variant: "body2",
-			fontWeight: "oblique",
-			component: "h6",
-			letterSpacing: "5px",
-			children: "Wareflow",
-		},
-		orgNameButtonProps: {
-			onClick: handleSiteNameClick,
-			disableRipple: true,
-		},
-		orgNameProps: {
-			variant: "body2",
-			component: "h6",
-			children: "Ogden Custom Solutions",
-		},
-	};
+	useEffect(() => {
+		if (status === "idle" && !token) {
+			nav("/");
+		}
+	}, [status, token, nav]);
 };

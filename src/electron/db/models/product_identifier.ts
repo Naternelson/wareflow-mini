@@ -9,8 +9,7 @@ import {
 } from "sequelize";
 import { sequelize } from "../db";
 import { Product } from "./product";
-import { cleanStringFields, cleanStringFieldsHooks } from "./utils/cleanStringFields";
-import { cleanString } from "../../utils";
+import { cleanStringFields } from "./utils/cleanStringFields";
 import { Organization } from "./organization";
 import { BasicProductIdentifier, ProductIdentifierType } from "../../../common/models/product-identifier";
 
@@ -26,12 +25,13 @@ export class ProductIdentifier extends Model<
 	declare value: string; // This is the actual value of the identifier
 	declare readonly createdAt: CreationOptional<Date>;
 	declare readonly updatedAt: CreationOptional<Date>;
-	declare organizationId: ForeignKey<number>;
+	declare organizationId: ForeignKey<Organization["id"]>;
+	declare organization?: NonAttribute<Organization>;
 	declare productId: ForeignKey<Product["id"]>;
 	declare product?: NonAttribute<Product>;
 
-	sanitize():BasicProductIdentifier{
-		const safe = this.toJSON() 
+	sanitize(): BasicProductIdentifier {
+		const safe = this.toJSON();
 		return {
 			id: safe.id,
 			primary: safe.primary,
@@ -42,7 +42,7 @@ export class ProductIdentifier extends Model<
 			updatedAt: safe.updatedAt,
 			productId: safe.productId,
 			organizationId: safe.organizationId,
-		}
+		};
 	}
 }
 
@@ -113,7 +113,7 @@ ProductIdentifier.init(
 		hooks: {
 			beforeValidate: cleanStringFields<ProductIdentifier>(["name", "value"]),
 			beforeCreate: async (instance, options) => {
-				if(!instance.name) instance.name = instance.type;
+				if (!instance.name) instance.name = instance.type;
 				if (instance.primary) {
 					await ProductIdentifier.update(
 						{ primary: false },
@@ -129,7 +129,7 @@ ProductIdentifier.init(
 				}
 			},
 			beforeUpdate: async (instance, options) => {
-				if(!instance.name) instance.name = instance.type;
+				if (!instance.name) instance.name = instance.type;
 				if (instance.changed("primary") && instance.primary) {
 					await ProductIdentifier.update(
 						{ primary: false },
@@ -143,7 +143,7 @@ ProductIdentifier.init(
 						}
 					);
 				}
-			}
+			},
 		},
 	}
 );
@@ -163,5 +163,4 @@ export const associateProductIdentifier = () => {
 		foreignKey: "organizationId",
 		as: "organization",
 	});
-	
 };

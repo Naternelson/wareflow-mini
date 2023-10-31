@@ -1,7 +1,6 @@
 import {
 	ApiError,
 	ApiRequest,
-	AuthResponse,
 	BadRequestError,
 	BasicUser,
 	ForbiddenError,

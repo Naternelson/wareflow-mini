@@ -5,7 +5,7 @@ import { NotFoundError } from "../../common/api_error";
 import { userFromTokenMiddleware } from "./middleware/retrieveUser";
 import { appControllers } from "./controllers";
 
-type MiddlewareFn = (request: ApiRequest<any, any> )=> Promise<ApiRequest<any, any>>;
+type MiddlewareFn = (request: ApiRequest )=> Promise<ApiRequest>;
 const middleware: MiddlewareFn[] = [userFromTokenMiddleware];
 
 
@@ -17,6 +17,8 @@ ipcMain.handle("api-call", async (_event, request) => {
     }
     const handler = appControllers.get(r.resource);
     if(!handler) throw new NotFoundError("No handler found for resource", {resource: r.resource});
-    return await handler(r);
+    const result = await handler(r);
+    
+    return result;
 
 })

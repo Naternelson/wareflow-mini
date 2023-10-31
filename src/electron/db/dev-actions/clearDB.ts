@@ -1,4 +1,3 @@
-import { Model, ModelCtor } from "sequelize";
 import { sequelize } from "../db";
 
 export const clearDB = async () => {

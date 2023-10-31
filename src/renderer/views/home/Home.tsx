@@ -1,7 +1,6 @@
 import React from "react";
 import { Stack, Typography, TypographyProps } from "@mui/material";
-import { SearchBar, StyledColumn } from "../../components";
-import {OrderListResponse} from "../../../common";
+import { SearchBar } from "../../components";
 // import {
 // 	OrderStatus,
 // 	OrdersResponse,
@@ -10,7 +9,9 @@ import {OrderListResponse} from "../../../common";
 // 	SanitizedOrderItem,
 // 	SanitizedProduct,
 // } from "../../../common/order";
-import { OrdersList } from "./OrderList";
+import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store/slices";
 
 
 export const Home = () => {
@@ -19,6 +20,7 @@ export const Home = () => {
 		<Stack padding={"1rem"} flex={"1"}>
 			<Typography {...orgNameProps} />
 			<SearchBar float={"right"} />
+			<Link to="/signup">Signup</Link>
 			{/* <OrdersList orders={fakeOrders} /> */}
 		</Stack>
 	);
@@ -27,10 +29,11 @@ export const Home = () => {
 const useDashboardHooks = (): {
 	orgNameProps: TypographyProps;
 } => {
+	const orgName = useSelector<RootState, string | undefined>((state) => state.auth.organization?.name);
 	return {
 		orgNameProps: {
 			variant: "h3",
-			children: "Ogden Custom Solutions",
+			children: orgName,
 		},
 	};
 };

@@ -22,14 +22,19 @@ function createWindow() {
 			preload: path.join(__dirname, "public", "preload.js"),
 		},
 	});
-	const FileMenuItems = Menu.getApplicationMenu()?.items[0].submenu
-	
+	const FileMenuItems = Menu.getApplicationMenu()?.items[0].submenu;
+
 	FileMenuItems?.insert(
 		0,
 		new MenuItem({
 			label: "Wipe DB",
-			click: () => {
-				clearDB();
+			click: async () => {
+				try {
+					clearDB();
+				} catch {
+					console.log("Failed to clear DB");
+				}
+
 				mainWindow?.reload();
 			},
 		})
@@ -39,12 +44,17 @@ function createWindow() {
 		new MenuItem({
 			label: "SeedDB",
 			click: () => {
-				SeedDb();
+				try {
+					SeedDb();
+				} catch {
+					console.log("Failed to seed DB");
+				}
+
 				mainWindow?.reload();
 			},
 		})
 	);
-	mainWindow.minimize();
+	mainWindow.maximize();
 	mainWindow.loadURL(isDev ? "http://localhost:3000" : `file://${path.join(__dirname, "public", "index.html")}`);
 
 	mainWindow.on("closed", () => {

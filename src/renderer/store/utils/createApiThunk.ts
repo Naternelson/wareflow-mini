@@ -1,11 +1,12 @@
-import { IpcRenderer } from "electron";
 import { ApiRequest, createApiRequest } from "../../../common";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { RootState } from "../slices";
 
-export function createApiThunk<T = any>(name: string, ipcRenderer: IpcRenderer){
-    const apiRequest = createApiRequest(ipcRenderer)
-    return createAsyncThunk(name, async (request:Omit<Partial<ApiRequest>, "body"> & {body: T}, api) => {
+type BasicRequest<T = any> = Omit<Partial<ApiRequest>, "body"> & {body: T}
+
+export function createApiThunk<T = any>(name: string){
+    const apiRequest = createApiRequest(window.electron.invoke)
+    return createAsyncThunk(name, async (request:BasicRequest<T>, api) => {
         const apiReq: ApiRequest = {
             ...request,
             resource: request.resource || name, 
@@ -19,7 +20,7 @@ export function createApiThunk<T = any>(name: string, ipcRenderer: IpcRenderer){
                 Authorization: `Bearer ${token}`
             }
         }
-        const {data}=  await apiRequest.invoke(apiReq)
-        return data 
+        const data =  await apiRequest.invoke(apiReq)
+        return data
     })
 }
