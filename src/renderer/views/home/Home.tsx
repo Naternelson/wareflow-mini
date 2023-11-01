@@ -1,27 +1,15 @@
 import React from "react";
 import { Stack, Typography, TypographyProps } from "@mui/material";
 import { SearchBar } from "../../components";
-// import {
-// 	OrderStatus,
-// 	OrdersResponse,
-// 	SanitizedCustomer,
-// 	SanitizedOrder,
-// 	SanitizedOrderItem,
-// 	SanitizedProduct,
-// } from "../../../common/order";
-import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/slices";
-
 
 export const Home = () => {
 	const { orgNameProps } = useDashboardHooks();
 	return (
-		<Stack padding={"1rem"} flex={"1"}>
+		<Stack direction={"column"} flex={"1"} spacing="1rem" padding={"1rem"} maxWidth={"600px"}>
 			<Typography {...orgNameProps} />
 			<SearchBar float={"right"} />
-			<Link to="/signup">Signup</Link>
-			{/* <OrdersList orders={fakeOrders} /> */}
 		</Stack>
 	);
 };
@@ -34,6 +22,10 @@ const useDashboardHooks = (): {
 		orgNameProps: {
 			variant: "h3",
 			children: orgName,
+			fontWeight: "bold",
+			fontStyle: "italic",
+			color: "grey",
+			textAlign: "center"
 		},
 	};
 };

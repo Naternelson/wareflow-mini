@@ -16,7 +16,7 @@ export const router = createBrowserRouter([
 		],
 	},
 	{
-		path: "/:organizatioSlug",
+		path: "/:organizationId",
 		element: <ProtectedLayout />,
 		children: [
 			{

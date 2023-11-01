@@ -1,8 +1,6 @@
-import { BasicBin } from "./bin";
+import { DeepDateToString } from "../type_helpers";
 import { BasicOrderIdentifier } from "./order-identifier";
-import { BasicOrderItem } from "./order-item";
-import { ProductResponse } from "./product";
-import { BasicProductItem } from "./product_item";
+import { BasicOrderItem, OrderItemStatus } from "./order-item";
 
 export interface BasicOrder {
     id: number;
@@ -14,18 +12,35 @@ export interface BasicOrder {
     updatedAt: Date;
 }
 
+
 export type OrderResponse = Partial<{
-    order: Partial<BasicOrder>;
-    primaryOrderIdentifier: Partial<BasicOrderIdentifier>;
-    secondaryOrderIdentifiers: Partial<BasicOrderIdentifier>[];
-	products: Partial<{ [id: number]: ProductResponse}>;
-    items: BasicOrderItem[];
-    bins: { [id: number]: Partial<BasicBin> };
-    productItems: { [id: number]: Partial<BasicProductItem>[] };
-}>;
+    data: Partial<BasicOrder>; 
+    items: Partial<BasicOrderItem>[];
+    secondaryIds: Partial<BasicOrderIdentifier>[];
+}>
+
+
 
 export type OrderListResponse = {
     orders: {[id:number]: OrderResponse}
-    internalIdentifiers: number[];
-    primaryIdentifiers: BasicOrderIdentifier[];
+    ids: number[];
+    secondaryIds: {[id:number]: OrderResponse["secondaryIds"]};
 };
+
+export type OrderRequestBody = {
+    dueBefore?: Date;
+    dueAfter?: Date;
+    limit?: number;
+    offset?: number;
+    organizationId?: number;
+    orderId?: number | number[];
+    status?: OrderItemStatus | OrderItemStatus[];
+    orderBy?: "status" | "dueBy" | "orderedOn" | "customer";
+    order?: "ASC" | "DESC";
+
+}
+
+export type SerializedOrderListResponse = DeepDateToString<OrderListResponse>;
+
+export type SerializedOrderResponse = DeepDateToString<OrderResponse>;
+

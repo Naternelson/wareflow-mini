@@ -4,7 +4,7 @@ import { AuthResponse, BasicOrganization, BasicUser, CreateUserBody, SigninToken
 import { createApiThunk } from "../utils/createApiThunk";
 import { RootState } from ".";
 import { useSelector } from "react-redux";
-import { DToS, DeepDateToString } from "../utils/serializedType";
+import { DToS, DeepDateToString } from "../../../common/type_helpers";
 
 export interface AuthState {
 	status: "idle" | "pending" | "loading" | "success" | "error";

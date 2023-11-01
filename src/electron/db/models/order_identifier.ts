@@ -2,6 +2,7 @@ import { DataTypes, InferAttributes, InferCreationAttributes, Model } from "sequ
 import { sequelize } from "../db";
 import { Organization } from "./organization";
 import { Order } from "./order";
+import { BasicOrderIdentifier } from "../../../common/models/order-identifier";
 
 export class OrderIdentifier extends Model<InferAttributes<OrderIdentifier>, InferCreationAttributes<OrderIdentifier>> {
 	static async getPrimaryIdentifier(orderId: number, organizationId: number): Promise<OrderIdentifier | null> {
@@ -22,6 +23,9 @@ export class OrderIdentifier extends Model<InferAttributes<OrderIdentifier>, Inf
 	declare value: string;
 	declare createdAt: Date;
 	declare updatedAt: Date;
+	sanitize():BasicOrderIdentifier {
+		return this.toJSON();
+	}
 }
 
 OrderIdentifier.init(

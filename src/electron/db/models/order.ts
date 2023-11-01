@@ -1,7 +1,9 @@
-import { CreationOptional, DataTypes, InferAttributes, InferCreationAttributes, Model } from "sequelize";
+import { CreationOptional, DataTypes, InferAttributes, InferCreationAttributes, Model, NonAttribute } from "sequelize";
 import { sequelize } from "../db";
 import { Organization } from "./organization";
 import { OrderIdentifier } from "./order_identifier";
+import { BasicOrder } from "../../../common";
+import { OrderItem } from "./order_item";
 
 export class Order extends Model<InferAttributes<Order>, InferCreationAttributes<Order>> {
 	declare id: CreationOptional<number>;
@@ -11,6 +13,13 @@ export class Order extends Model<InferAttributes<Order>, InferCreationAttributes
 	declare dueBy: Date;
 	declare createdAt: CreationOptional<Date>;
 	declare updatedAt: CreationOptional<Date>;
+	declare orderIdentifiers: NonAttribute<OrderIdentifier[]>; 
+	declare organization?: NonAttribute<Organization>;
+	declare items: NonAttribute<OrderItem[]>;
+
+	sanitize():BasicOrder{
+		return this.toJSON();
+	}
 }
 
 Order.init(
@@ -55,4 +64,5 @@ export const associateOrder = () => {
 
 	// Order.hasMany(OrderItem, {foreignKey: "orderId", as: "orderItems"})
 	Order.hasMany(OrderIdentifier, { foreignKey: "orderId", as: "orderIdentifiers" });
+	Order.hasMany(OrderItem, { foreignKey: "orderId", as: "items" })
 };

@@ -2,7 +2,7 @@ import { CreationOptional, DataTypes, ForeignKey, InferAttributes, InferCreation
 import { sequelize } from "../db";
 import { Order } from "./order";
 import { Product } from "./product";
-import { OrderItemStatus } from "../../../common";
+import { BasicOrderItem, OrderItemStatus } from "../../../common";
 
 export class OrderItem extends Model<InferAttributes<OrderItem>, InferCreationAttributes<OrderItem>> {
 	declare id: CreationOptional<number>;
@@ -13,6 +13,9 @@ export class OrderItem extends Model<InferAttributes<OrderItem>, InferCreationAt
 	declare status: string; 
 	declare createdAt: CreationOptional<Date>;
 	declare updatedAt: CreationOptional<Date>;
+	sanitize():BasicOrderItem{
+		return this.toJSON();
+	}
 }
 
 OrderItem.init(
