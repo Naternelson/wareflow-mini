@@ -1,4 +1,4 @@
-import { DataTypes, InferAttributes, InferCreationAttributes, Model } from "sequelize";
+import { CreationOptional, DataTypes, InferAttributes, InferCreationAttributes, Model } from "sequelize";
 import { sequelize } from "../db";
 import { Organization } from "./organization";
 import { Order } from "./order";
@@ -15,15 +15,15 @@ export class OrderIdentifier extends Model<InferAttributes<OrderIdentifier>, Inf
 		});
 	}
 
-	declare id: number;
+	declare id: CreationOptional<number>;
 	declare primary: boolean;
 	declare orderId: number;
 	declare organizationId: number;
 	declare name: string;
 	declare value: string;
-	declare createdAt: Date;
-	declare updatedAt: Date;
-	sanitize():BasicOrderIdentifier {
+	declare createdAt: CreationOptional<Date>;
+	declare updatedAt: CreationOptional<Date>;
+	sanitize(): BasicOrderIdentifier {
 		return this.toJSON();
 	}
 }

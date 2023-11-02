@@ -44,3 +44,21 @@ export type SerializedOrderListResponse = DeepDateToString<OrderListResponse>;
 
 export type SerializedOrderResponse = DeepDateToString<OrderResponse>;
 
+
+export type NewOrderRequestBody = {
+    organizationId: number;
+    orderedOn: Date;
+    dueBy: Date;
+    customer: string;
+    items: {
+        status: OrderItemStatus;
+        productId: number;
+        quantity: number;
+        unit: string;
+    }[];
+    identifiers: {
+        name: string;
+        value: string;
+        primary: boolean;
+    }[];
+}

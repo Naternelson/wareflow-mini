@@ -11,6 +11,7 @@ import { sequelize } from "../db";
 import { Product } from "./product";
 import { ItemIdentifier } from "./item_identifier";
 import { cleanStringFieldsHooks } from "./utils/cleanStringFields";
+import { BasicProductSpec } from "../../../common/models/product_spec";
 
 export class ProductSpec extends Model<InferAttributes<ProductSpec>, InferCreationAttributes<ProductSpec>> {
 	declare id: CreationOptional<number>;
@@ -22,6 +23,9 @@ export class ProductSpec extends Model<InferAttributes<ProductSpec>, InferCreati
 	declare readonly updatedAt: CreationOptional<Date>;
 	declare productId: ForeignKey<Product["id"]>;
 	declare product?: NonAttribute<Product>;
+	sanitize():BasicProductSpec{
+		return this.toJSON();
+	}
 }
 
 ProductSpec.init(

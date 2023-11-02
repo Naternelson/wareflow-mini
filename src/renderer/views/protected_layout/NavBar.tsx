@@ -1,8 +1,20 @@
-import React from "react";
-import { AppBar, Toolbar, Typography, TypographyProps, ButtonBase, ButtonBaseProps, } from "@mui/material";
+import React, { PropsWithChildren, ReactNode, useState } from "react";
+import {
+	AppBar,
+	Toolbar,
+	Typography,
+	TypographyProps,
+	ButtonBase,
+	ButtonBaseProps,
+	Menu,
+	MenuItem,
+	IconButton,
+} from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { StyledColumn, StyledRow } from "../../components";
 import { ArrowDropDown, Home } from "@mui/icons-material";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store/slices";
 
 export const NavBar = () => {
 	const { siteNameButtonProps, siteNameProps, orgNameButtonProps, orgNameProps } = useNavBarHooks();
@@ -19,11 +31,10 @@ export const NavBar = () => {
 						</ButtonBase>
 					</StyledRow>
 					<StyledRow gap={"2rem"}>
-						<ButtonBase style={{ alignItems: "center", gap: ".25rem" }}>
-							<Home fontSize="small" />
-							<Typography variant="body1">Home</Typography>
-							<ArrowDropDown fontSize="small" />
-						</ButtonBase>
+						<NavMenu label={"Home"} to="/">
+							<HomeMenu/>
+						</NavMenu>
+
 						<ButtonBase>
 							<Typography variant="body1">Orders</Typography>
 							<ArrowDropDown fontSize="small" />
@@ -49,6 +60,7 @@ const useNavBarHooks = (): {
 	orgNameButtonProps: ButtonBaseProps;
 	orgNameProps: TypographyProps;
 } => {
+	const name = useSelector<RootState, string | undefined>((state) => state.auth.organization?.name);
 	const nav = useNavigate();
 	const handleSiteNameClick = () => {
 		nav("/");
@@ -72,7 +84,60 @@ const useNavBarHooks = (): {
 		orgNameProps: {
 			variant: "body2",
 			component: "h6",
-			children: "Ogden Custom Solutions",
+			children: name,
 		},
 	};
+};
+
+const HomeMenu = (props: {handleClose?: () => void}) => {
+	const nav = useNavigate();
+	const handleNav = () => {
+		nav("orders/new");
+		if(props.handleClose){
+			props.handleClose();
+		}
+	};
+	return (
+		<>
+			<MenuItem onClick={handleNav}>New Order</MenuItem>
+		</>
+	);
+};
+
+const NavMenu = (props: PropsWithChildren<{ label: string; Icon?: ReactNode; to?: string }>) => {
+	const { label, Icon, to, children } = props;
+	const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
+	const ref = React.useRef<HTMLButtonElement>(null);
+	const handleClick = (e: any) => {
+		e.preventDefault();
+		e.stopPropagation();
+		setAnchorEl(ref.current);
+	};
+	const handleClose = () => {
+		setAnchorEl(null);
+	};
+	const nav = useNavigate();
+	const handleNav = () => {
+		if (to) {
+			nav(to);
+		}
+		handleClose();
+	};
+
+	return (
+		<>
+			<ButtonBase ref={ref} style={{ alignItems: "center", gap: ".25rem" }} onClick={handleNav}>
+				{Icon && Icon}
+				<Typography variant="body1">{label}</Typography>
+				<IconButton disableRipple onClick={handleClick} color={"inherit"}>
+					<ArrowDropDown fontSize="small" color={"inherit"} />
+				</IconButton>
+			</ButtonBase>
+			<Menu onClose={handleClose} open={Boolean(anchorEl)} anchorEl={anchorEl}>
+				{React.Children.map(children, (child) => {
+					return React.cloneElement(child as React.ReactElement, { handleClose });
+				})}
+			</Menu>
+		</>
+	);
 };

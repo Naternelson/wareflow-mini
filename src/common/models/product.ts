@@ -1,4 +1,6 @@
 import { ProductIdentifier } from "../../electron/db/models";
+import { BasicProductIdentifier } from "./product-identifier";
+import { BasicProductSpec } from "./product_spec";
 
 export interface BasicProduct {
 	id: number;
@@ -9,7 +11,26 @@ export interface BasicProduct {
 }
 
 export type ProductResponse = Partial<{
-	product: Partial<ProductResponse>;
-	primaryIdentifiers: Partial<ProductIdentifier>;
-	secondaryIdentifiers: Partial<ProductIdentifier>[];
+	data: Partial<BasicProduct>;
+	specs: Partial<BasicProductSpec>[];
+	ids: number[];
+	secondaryIds: Record<number, BasicProductIdentifier>;
 }>;
+
+export type ProductListResponse = {
+	products: Record<number, ProductResponse>;
+	ids: number[];
+	secondaryIds: Record<number, BasicProductIdentifier[]>;
+};
+
+export type ProductRequestBody = {
+	organizationId?: number,
+	productId?: number | number[];
+	search?: string;
+	limit?: number;
+	offset?: number;
+	orderBy?: {
+		[name: string]: "ASC" | "DESC";
+	},
+};
+

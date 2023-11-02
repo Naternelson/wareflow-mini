@@ -28,7 +28,11 @@ export class Product extends Model<InferAttributes<Product>, InferCreationAttrib
 	declare productGroup?: NonAttribute<ProductGroup>;
 	declare productSpecs: NonAttribute<ProductSpec[]>;
 	declare productItems: NonAttribute<ProductItem[]>;
+	declare productIdentifiers: NonAttribute<ProductIdentifier[]>;
 	// declare workflows: NonAttribute<Workflow[]>;
+	sanitize() {
+		return this.toJSON();
+	}
 }
 
 Product.init(

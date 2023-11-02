@@ -3,6 +3,7 @@ import { createBrowserRouter } from "react-router-dom";
 import { Home, ProtectedLayout } from "../views";
 import { PublicLayout } from "../views/public_layout";
 import { LoginPage } from "../views/login";
+import { OrdersNewPage } from "../views/orders_new";
 
 export const router = createBrowserRouter([
 	{
@@ -23,6 +24,14 @@ export const router = createBrowserRouter([
 				index: true,
 				element: <Home />,
 			},
+			{
+				element: <OrdersNewPage />,
+				path: "orders/new"
+			},
+			{
+				element: <Home />,
+				path: "orders"
+			}
 		],
 	},
 ]);
