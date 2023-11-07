@@ -15,6 +15,8 @@ export const getProducts = async (request:ApiRequest):Promise<ProductListRespons
         authenticateUser(request, UserPermission.User, organizationId);
         const fields = validateFields(request)
         const query = constructQuery(fields)
+    console.log("REQUEST GETPRODUCTS", {query: query});
+
         const products = await Product.findAll(query)
         const result:ProductListResponse = {
             products: {},
@@ -23,13 +25,13 @@ export const getProducts = async (request:ApiRequest):Promise<ProductListRespons
         }
         products.forEach(product => {
             const sanitized = product.sanitize()
-            const {productIdentifiers} = product
+            const {productIdentifiers} = product || {}
 
             result.products[sanitized.id] = {
                 data: sanitized,
-                specs: product.productSpecs.map(spec => spec.sanitize()),
-                ids: productIdentifiers.map(identifier => identifier.id),
-                secondaryIds: productIdentifiers.reduce((acc, identifier) => {
+                specs: product?.productSpecs?.map(spec => spec.sanitize()),
+                ids: productIdentifiers?.map(identifier => identifier.id),
+                secondaryIds: productIdentifiers?.reduce((acc, identifier) => {
                     acc[identifier.id] = identifier.sanitize()
                     return acc
                 }, {} as Record<number, BasicProductIdentifier>)
@@ -68,7 +70,16 @@ const validateFields = (request:ApiRequest):ProductRequestBody => {
 const constructQuery = (fields: ProductRequestBody): FindOptions<InferAttributes<Product>> => {
 	const query: FindOptions<InferAttributes<Product>> = {
 		where: {},
-		include: [],
+		include: [
+			{
+				model: ProductIdentifier,
+				as: "productIdentifiers", // replace with the actual alias you have given for the relation
+			},
+            {
+                model: ProductSpec,
+                as: "productSpecs"
+            }
+		],
 		order: [],
 	};
 
@@ -88,16 +99,6 @@ const constructQuery = (fields: ProductRequestBody): FindOptions<InferAttributes
 			],
 		};
 
-		query.include = [
-			{
-				model: ProductIdentifier,
-				as: "productIdentifiers", // replace with the actual alias you have given for the relation
-			},
-            {
-                model: ProductSpec,
-                as: "productSpecs"
-            }
-		];
 	}
 
 	if (fields.orderBy) {

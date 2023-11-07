@@ -2,7 +2,7 @@ import { CreateOptions, CreationOptional, DataTypes, InferAttributes, InferCreat
 import { sequelize } from "../db";
 import { Organization } from "./organization";
 import { OrderIdentifier } from "./order_identifier";
-import { BasicOrder, OrderItemStatus } from "../../../common";
+import { BasicOrder, NewOrderRequestBody, OrderItemStatus } from "../../../common";
 import { OrderItem } from "./order_item";
 
 
@@ -39,13 +39,15 @@ export class Order extends Model<InferAttributes<Order>, InferCreationAttributes
 		);
 	}
 	async addItem(
-		item: { productId: number; quantity: number; unit: string; status: OrderItemStatus },
+		item: NewOrderRequestBody["items"][0],
 		options?: CreateOptions<InferAttributes<OrderItem, { omit: never }>>
 	): Promise<OrderItem> {
-		return await OrderItem.create({ ...item, orderId: this.id }, options);
+		const { productId, quantity, unit, status } = item;
+		if(!productId || !quantity || !unit || !status) throw new Error("Invalid item") 
+		return await OrderItem.create({orderId: this.id, productId, quantity, unit, status }, options);
 	}
 	async addItems(
-		items: { productId: number; quantity: number; unit: string; status: OrderItemStatus }[],
+		items: NewOrderRequestBody["items"],
 		options?: CreateOptions<InferAttributes<OrderItem, { omit: never }>>
 	) {
 		return await Promise.all(

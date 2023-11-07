@@ -1,13 +1,12 @@
 import { ProductIdentifier } from "../../electron/db/models";
+import { BasicModel } from "../type_helpers";
 import { BasicProductIdentifier } from "./product-identifier";
 import { BasicProductSpec } from "./product_spec";
 
-export interface BasicProduct {
-	id: number;
+export type BasicProduct = BasicModel &{
 	name: string;
+	description: string;
 	unit: string;
-	createdAt: Date;
-	updatedAt: Date;
 }
 
 export type ProductResponse = Partial<{

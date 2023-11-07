@@ -16,7 +16,7 @@ export const ProtectedLayout = () => {
 		<ViewBoxContainer>
 			<NavBar />
 			<Toolbar />
-			<OutletContainer>
+			<OutletContainer id={"yo"}>
 				<Outlet />
 				<Footer>
 					<Stack>
@@ -37,7 +37,6 @@ const ViewBoxContainer = styled(Box)(({ theme }) => ({
 	display: "flex",
 	flexDirection: "column",
 	height: "100vh",
-	overflow: "auto",
 	backgroundColor: theme.palette.background.default,
 	color: theme.palette.text.primary,
 }));
@@ -57,6 +56,8 @@ const OutletContainer = styled(Box)(({ theme }) => ({
 	display: "flex",
 	flexDirection: "column",
 	justifyContent: "space-between",
+	overflow: "overlay",
+	scrollbarGutter: "stable both-edges"
 }));
 
 const Footer = styled("footer")(({ theme }) => ({

@@ -14,7 +14,7 @@ export class OrderItem extends Model<InferAttributes<OrderItem>, InferCreationAt
 	declare createdAt: CreationOptional<Date>;
 	declare updatedAt: CreationOptional<Date>;
 	sanitize():BasicOrderItem{
-		return this.toJSON();
+		return this.toJSON() as BasicOrderItem;
 	}
 }
 

@@ -28,7 +28,6 @@ const useDashboardHooks = (): {
 	nav: ReturnType<typeof useNavigate>;
 } => {
 	const orgName = useSelector<RootState, string | undefined>((state) => state.auth.organization?.name);
-
 	const dispatch = useDispatch<AppDispatch>();
 	useEffect(() => {
 		const fn = async () => {

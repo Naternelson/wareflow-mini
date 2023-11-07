@@ -47,7 +47,7 @@ const useRedirect = () => {
 	const auth = useSelector<RootState, AuthState>((state) => state.auth);
 	const { token, status, organization } = auth;
 	const nav = useNavigate();
-	React.useEffect(() => {
+	React.useLayoutEffect(() => {
 		if (status !== "pending" && token && organization?.id) {
 			nav("/" + organization?.id);
 		}

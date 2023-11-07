@@ -7,7 +7,7 @@ export enum OrderItemStatus {
     CANCELLED = "cancelled",
 
 }
-export interface BasicOrderItem {
+export type BasicOrderItem = {
     id: number;
     orderId: number;
     productId: number;

@@ -9,6 +9,8 @@ import {
 	Menu,
 	MenuItem,
 	IconButton,
+	styled,
+	Box,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { StyledColumn, StyledRow } from "../../components";
@@ -129,9 +131,9 @@ const NavMenu = (props: PropsWithChildren<{ label: string; Icon?: ReactNode; to?
 			<ButtonBase ref={ref} style={{ alignItems: "center", gap: ".25rem" }} onClick={handleNav}>
 				{Icon && Icon}
 				<Typography variant="body1">{label}</Typography>
-				<IconButton disableRipple onClick={handleClick} color={"inherit"}>
-					<ArrowDropDown fontSize="small" color={"inherit"} />
-				</IconButton>
+				<StyledIconContainer onClick={handleClick} color={"inherit"}>
+					<StyledArrowDropDown aria-expanded={Boolean(anchorEl)} fontSize="small" color={"inherit"} />
+				</StyledIconContainer>
 			</ButtonBase>
 			<Menu onClose={handleClose} open={Boolean(anchorEl)} anchorEl={anchorEl}>
 				{React.Children.map(children, (child) => {
@@ -141,3 +143,17 @@ const NavMenu = (props: PropsWithChildren<{ label: string; Icon?: ReactNode; to?
 		</>
 	);
 };
+
+
+const StyledArrowDropDown = styled(ArrowDropDown)(({ theme, ...props }) => ({
+	transform: props["aria-expanded"] ? "rotate(180deg)" : "rotate(0deg)",
+	transition: "transform .2s ease-in-out",
+}))
+
+const StyledIconContainer = styled(Box)(({ theme }) => ({
+	width: "1.5rem",
+	height: "1.5rem",
+	display: "flex",
+	alignItems: "center",
+	justifyContent: "center",
+}));

@@ -19,10 +19,12 @@ export const OrderIdentifiers = () => {
 	return (
 		<Stack>
 			<Typography>Custom IDs</Typography>
-			{idsArray.fields.map((field, index) => (
-				<IdentifierGroup key={field.id} {...idsArray} index={index} />
-			))}
-            <Button onClick={() => idsArray.append({ name: "", value: "", primary: false })}>Add ID</Button>
+			<Stack spacing={1}>
+				{idsArray.fields.map((field, index) => (
+					<IdentifierGroup key={field.id} {...idsArray} index={index} />
+				))}
+			</Stack>
+			<Button onClick={() => idsArray.append({ name: "", value: "", primary: false })}>Add ID</Button>
 		</Stack>
 	);
 };
@@ -53,31 +55,38 @@ const IdentifierGroup = (props: FieldType & { index: number }) => {
         return errors.identifiers?.[props.index]?.[name]?.message;
     }
 	return (
-		<Stack direction={"row"} spacing={2}>
+		<Stack direction={"row"} spacing={2} alignItems={"start"}>
 			<Controller
 				name={`identifiers.${props.index}.primary`}
 				control={control}
-				render={({ field: { onChange, ...field } }) => (
-					<FormControlLabel
+				render={({ field: { onChange, ...field } }) => {
+					const checked = typeof field.value === "string" ? field.value === "true" : field.value;
+					return <FormControlLabel
 						onChange={() => {
 							onChange(true);
 							props.fields.forEach((_identifier, idx) => {
-                                const identifier = getValues(`identifiers.${idx}`);
+								const identifier = getValues(`identifiers.${idx}`);
 								if (idx === props.index) props.update(idx, { ...identifier, primary: true });
 								else props.update(idx, { ...identifier, primary: false });
-                                console.log(identifier, idx);
+								console.log(identifier, idx);
 							});
 						}}
 						control={
 							<Radio
 								{...field}
-								checked={typeof field.value === "string" ? field.value === "true" : field.value}
+								checked={checked}
 								color={!!getErrorMessage("primary") ? "error" : "default"}
 							/>
 						}
-						label="Primary"
+						label={
+							<Typography
+								fontWeight={checked ? "bold" : "normal"}
+								fontStyle={"italic"}>
+								Primary
+							</Typography>
+						}
 					/>
-				)}
+				}}
 			/>
 			<Controller
 				name={`identifiers.${props.index}.name`}
@@ -96,9 +105,10 @@ const IdentifierGroup = (props: FieldType & { index: number }) => {
 					<TextField
 						{...field}
 						label="ID Name"
-						placeholder={"SKU, UPC, etc"}
+						placeholder={"WO, PO, etc"}
 						error={!!getErrorMessage("name")}
 						helperText={getErrorMessage("name")}
+						fullWidth={false}
 					/>
 				)}
 			/>

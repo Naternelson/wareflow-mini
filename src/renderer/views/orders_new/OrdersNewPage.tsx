@@ -1,6 +1,6 @@
 import { Box, Button, Divider, Paper, Stack, Typography, styled } from "@mui/material";
 import { FormProvider, useForm } from "react-hook-form";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../store/slices";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -11,12 +11,14 @@ import { OrderIdentifiers } from "./OrderIdentifiers";
 import { OrderItems } from "./OrderItems";
 import { useEffect } from "react";
 import { OrderItemStatus } from "../../../common";
+import { AppDispatch } from "../../store";
+import { getProducts } from "../../store/slices/products";
 
 export const OrdersNewPage = () => {
 	const { onSubmit, form } = useNewOrderFormHook();
 	return (
 		<Box>
-			<StyledPaper elevation={3}>
+			<StyledPaper elevation={3} className="fadeUp">
 				<LocalizationProvider dateAdapter={AdapterDayjs}>
 					<FormProvider {...form}>
 						<form onSubmit={onSubmit}>
@@ -57,6 +59,8 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
 
 const useNewOrderFormHook = () => {
 	const organizationId = useSelector<RootState, number | undefined>((state) => state.auth.organization?.id);
+	const status = useSelector<RootState, string | undefined>((state) => state.products.status);
+	const dispatch = useDispatch<AppDispatch>();
 	const frm = useForm<FormFields>({
         mode: "onTouched",
 		defaultValues: {
@@ -65,11 +69,10 @@ const useNewOrderFormHook = () => {
 			dueBy: dayjs(new Date()),
 			customer: "",
 			items: [{
-                status: OrderItemStatus.PENDING,
-                productId: 0,
-                quantity: 0,
-                unit: "unit",
-            }],
+				productId: undefined, 
+				quantity: 1,
+				status: OrderItemStatus.PENDING,
+			}],
 			identifiers: [
 				{
 					name: "",
@@ -80,15 +83,22 @@ const useNewOrderFormHook = () => {
 		},
 	});
 	const onSumbit = frm.handleSubmit((data) => {
-		console.log(data);
+		console.log("New Order", data.dueBy.toDate());
 	});
 
     useEffect(() => {
         // Get Products
-    },[])
+		const fn = () => {
+			if(status === "idle" && organizationId) {
+				dispatch(getProducts({ body: { organizationId } }));
+			}
+		}
+		fn();
+    },[dispatch, status, organizationId])
 
 	return {
 		form: frm,
 		onSubmit: onSumbit,
+		productsStatus: status
 	};
 };

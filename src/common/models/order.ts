@@ -50,12 +50,12 @@ export type NewOrderRequestBody = {
     orderedOn: Date;
     dueBy: Date;
     customer: string;
-    items: {
+    items: Partial<{
         status: OrderItemStatus;
         productId: number;
         quantity: number;
         unit: string;
-    }[];
+    }>[];
     identifiers: {
         name: string;
         value: string;

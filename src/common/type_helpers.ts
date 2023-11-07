@@ -21,3 +21,12 @@ export type DeepDayJs<T> = {
 		? DeepDayJs<T[K]>
 		: T[K];
 };
+
+export type BasicModel = {
+	id: number;
+	createdAt: Date;
+	updatedAt: Date;
+	deletedAt?: Date;
+}
+
+export type CreationAttributes<T extends Record<any, unknown>, B extends string = ""> = Omit<T, keyof BasicModel | B> 
