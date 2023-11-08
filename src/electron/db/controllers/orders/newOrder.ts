@@ -24,6 +24,7 @@ export const newOrder = async (request: ApiRequest): Promise<OrderResponse> => {
             secondaryIds: ids.map(id => id.sanitize()),
             items: items.map(item => item.sanitize()),
         };
+		console.log("Success", {result})
         return result
 	} catch (error) {
         logger.error(error);

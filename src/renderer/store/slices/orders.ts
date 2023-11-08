@@ -33,15 +33,15 @@ export const ordersSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
-            .addCase(getOrders.pending, pendingReducer)
-            .addCase(getOrders.fulfilled, fulfilledOrdersReducer)
-            .addCase(getOrders.rejected, rejectedReducer)
-            .addCase(newOrder.pending, pendingReducer)
-            .addCase(newOrder.fulfilled, fulfullOrderReducer)
-            .addCase(newOrder.rejected, rejectedReducer)
-            .addCase(getOrder.pending, pendingReducer)
-            .addCase(getOrder.fulfilled, fulfullOrderReducer)
-            .addCase(getOrder.rejected, rejectedReducer)
+			.addCase(getOrders.pending, pendingReducer)
+			.addCase(getOrders.fulfilled, fulfilledOrdersReducer)
+			.addCase(getOrders.rejected, rejectedReducer)
+			.addCase(newOrder.pending, pendingReducer)
+			.addCase(newOrder.fulfilled, fulfilledOrderReducer)
+			.addCase(newOrder.rejected, rejectedReducer)
+			.addCase(getOrder.pending, pendingReducer)
+			.addCase(getOrder.fulfilled, fulfilledOrderReducer)
+			.addCase(getOrder.rejected, rejectedReducer);
     }
 })
 
@@ -53,7 +53,7 @@ const pendingReducer = (state: OrdersState) => {
 }
 const rejectedReducer = (state: OrdersState, action: PayloadAction<any>) => {
     state.status = "error";
-    state.error = action.payload.message || "Failed to get orders";
+    state.error = action.payload?.message || "Failed to get orders";
 }
 
 const fulfilledOrdersReducer = (state: OrdersState, action: PayloadAction<SerializedOrderListResponse>) => {
@@ -65,17 +65,18 @@ const fulfilledOrdersReducer = (state: OrdersState, action: PayloadAction<Serial
 	state.secondaryOrderIds = data.secondaryIds;
 };
 
-
-const fulfullOrderReducer = (state: OrdersState, action: PayloadAction<SerializedOrderResponse>) => {
+const fulfilledOrderReducer = (state: OrdersState, action: PayloadAction<SerializedOrderResponse>) => {
+    console.log("Payload",{payload: action.payload, state: {...state}})
     const data = action.payload;
     state.status = "success";
     state.error = null;
     const id = data.data?.id;
     if(!id) return;
     state.orders[id] = data;
-    if(!state.orderIds.includes(id)) state.orderIds.push(id);
-    else state.orderIds.push(id) 
-    state.secondaryOrderIds[id] = data.secondaryIds;
+    // if(!state.orderIds?.includes(id)) state.orderIds.push(id);
+    // else state.orderIds.push(id) 
+    // state.secondaryOrderIds[id] = data.secondaryIds;
 
 }
+
 

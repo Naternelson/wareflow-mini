@@ -2,19 +2,21 @@ import { Middleware, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../slices";
 
 const dateSerializerMiddleware: Middleware<{}, RootState> = (store) => (next) => (action: PayloadAction<any>) => {
-	const serializeDates = (obj: Record<string, any>): Record<string, any> => {
-		const result: Record<string, any> = {};
-		for (const key in obj) {
-			if (obj[key] instanceof Date) {
-				result[key] = obj[key].toISOString();
-			} else if (typeof obj[key] === "object" && obj[key] !== null) {
-				result[key] = serializeDates(obj[key]);
-			} else {
-				result[key] = obj[key];
-			}
+	const serializeDates = (value: any): any => {
+		if (value instanceof Date) {
+			return value.toISOString();
+		} else if (Array.isArray(value)) {
+			return value.map((item) => serializeDates(item));
+		} else if (typeof value === "object" && value !== null) {
+			return Object.keys(value).reduce((acc, key) => {
+				acc[key] = serializeDates(value[key]);
+				return acc;
+			}, {} as any);
+		} else {
+			return value;
 		}
-		return result;
 	};
+
 
 	const newAction = action.payload
 		? {

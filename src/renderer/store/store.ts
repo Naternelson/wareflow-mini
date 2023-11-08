@@ -8,7 +8,7 @@ import { reducers } from "./slices";
 const persistConfig = {
 	key: "root",
 	storage,
-	whitelist: ["auth", "orders"],
+	whitelist: ["auth"],
 };
 const persistedReducer = persistReducer(persistConfig, reducers);
 

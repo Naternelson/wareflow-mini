@@ -9,16 +9,23 @@ import { FormFields } from "./types";
 import { GlobalOrderFields } from "./GlobalFields";
 import { OrderIdentifiers } from "./OrderIdentifiers";
 import { OrderItems } from "./OrderItems";
-import { useEffect } from "react";
-import { OrderItemStatus } from "../../../common";
+import { useEffect, useState } from "react";
+import { NewOrderRequestBody, OrderItemStatus } from "../../../common";
 import { AppDispatch } from "../../store";
 import { getProducts } from "../../store/slices/products";
+import { newOrder } from "../../store/slices/orders";
+import { wait } from "../../utility/wait";
+import { LoaderRipple } from "../../components";
+import { useNavigate } from "react-router-dom";
+import { LoaderText } from "../../components/loader_text";
 
 export const OrdersNewPage = () => {
-	const { onSubmit, form } = useNewOrderFormHook();
+	const { onSubmit, form, loading, success } = useNewOrderFormHook();
 	return (
 		<Box>
-			<StyledPaper elevation={3} className="fadeUp">
+			<StyledPaper elevation={3} className={["fadeup", loading && "loading"].filter(el=>!!el).join(" ")}>
+				{loading && !success && <LoaderRipple/>}
+				{success && <LoaderText text="Order Created Successfully"/>}
 				<LocalizationProvider dateAdapter={AdapterDayjs}>
 					<FormProvider {...form}>
 						<form onSubmit={onSubmit}>
@@ -61,6 +68,9 @@ const useNewOrderFormHook = () => {
 	const organizationId = useSelector<RootState, number | undefined>((state) => state.auth.organization?.id);
 	const status = useSelector<RootState, string | undefined>((state) => state.products.status);
 	const dispatch = useDispatch<AppDispatch>();
+	const nav = useNavigate()
+	const [loading, setLoading] = useState(false);
+	const [success, setSuccess] = useState(false)
 	const frm = useForm<FormFields>({
         mode: "onTouched",
 		defaultValues: {
@@ -69,6 +79,7 @@ const useNewOrderFormHook = () => {
 			dueBy: dayjs(new Date()),
 			customer: "",
 			items: [{
+				unit: "unit",
 				productId: undefined, 
 				quantity: 1,
 				status: OrderItemStatus.PENDING,
@@ -82,8 +93,25 @@ const useNewOrderFormHook = () => {
 			],
 		},
 	});
-	const onSumbit = frm.handleSubmit((data) => {
-		console.log("New Order", data.dueBy.toDate());
+	const onSumbit = frm.handleSubmit(async(data) => {
+		const newOrderRequest: NewOrderRequestBody = {
+			...data,
+			orderedOn: data.orderedOn.toDate(),
+			dueBy: data.dueBy.toDate(),
+		}
+		setLoading(true)
+		try {
+			const result = await dispatch(newOrder({body: newOrderRequest}))
+			const id = result.payload?.data?.id;
+			setSuccess(true)
+			await wait(2000)
+			nav(`../orders/${id}/build`, {state: {newOrderRequest}})
+		} catch (error) {
+			console.error(error)
+			setSuccess(false)
+			setLoading(false)
+		}
+		
 	});
 
     useEffect(() => {
@@ -99,6 +127,8 @@ const useNewOrderFormHook = () => {
 	return {
 		form: frm,
 		onSubmit: onSumbit,
-		productsStatus: status
+		productsStatus: status,
+		loading,
+		success
 	};
 };

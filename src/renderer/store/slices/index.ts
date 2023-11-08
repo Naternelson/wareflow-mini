@@ -6,7 +6,7 @@ import { productsReducer } from "./products";
 export const reducers = combineReducers({
     auth: authReducer,
     orders: ordersReducer,
-    products: productsReducer
+    products: productsReducer,
 })
 
 export type RootState = ReturnType<typeof reducers>

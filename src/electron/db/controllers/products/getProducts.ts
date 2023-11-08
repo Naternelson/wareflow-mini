@@ -15,7 +15,6 @@ export const getProducts = async (request:ApiRequest):Promise<ProductListRespons
         authenticateUser(request, UserPermission.User, organizationId);
         const fields = validateFields(request)
         const query = constructQuery(fields)
-    console.log("REQUEST GETPRODUCTS", {query: query});
 
         const products = await Product.findAll(query)
         const result:ProductListResponse = {
